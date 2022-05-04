@@ -20,6 +20,7 @@ Shader "tkVlit/DrawFinal"
             sampler2D volumeFrontTexture;
             sampler2D volumeBackTexture;
             sampler2D cameraTargetTexture;
+            sampler2D _CameraDepthTexture;
 
             float4x4 viewProjMatrixInv; // ビュープロジェクション変換の逆行列。
             float ramdomSeed;           // ランダムシード。
@@ -136,7 +137,9 @@ Shader "tkVlit/DrawFinal"
                 half3 lig = 0;
                 // 三つの光を合成。    
                 // 光のベースを計算。
-                half3 ligBase = albedoColor * step( volumeFrontZ, albedoColor.w ) * max( 0.0f, log(volume) ) * 0.1f;
+                // 深度値に応じて拡散させていく。
+                half sceneDepth = tex2D(_CameraDepthTexture, uv);
+                half3 ligBase = albedoColor * step( volumeFrontZ, 1.0f - sceneDepth) * max( 0.0f, log(volume) ) * 0.1f;
                 // 光のベースに影響率を乗算する。
                 lig = ligBase * affect.x * spotLight.color; 
                 lig += ligBase * affect.y * spotLight.color2;

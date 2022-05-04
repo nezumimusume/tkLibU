@@ -49,8 +49,11 @@ namespace VolumeLight
         ShaderPropertyToID m_shaderPropToId = new ShaderPropertyToID();
         VolumeSpotLightData[] m_volumeSpotLightDataArray = new VolumeSpotLightData[1];
         GraphicsBuffer m_volumeSpotLightDataGraphicsBuffer;
-        
-        
+
+        private void OnDestroy()
+        {
+            DestroyImmediate(m_material);
+        }
         void Start()
         {
             // スポットライトのデータを送るためのストラクチャードバッファを作成。
@@ -63,7 +66,7 @@ namespace VolumeLight
             var meshRenderer = GetComponent<MeshRenderer>();
             meshRenderer.enabled = false;
             m_meshFilter = GetComponent<MeshFilter>();
-            m_material = meshRenderer.sharedMaterial;
+            m_material = new Material( meshRenderer.sharedMaterial);
             
             // 各種シェーダーパラメータのIDを取得する。
             m_shaderPropToId.volumeFrontTexID = Shader.PropertyToID("volumeFrontTexture");

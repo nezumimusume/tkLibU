@@ -11,20 +11,21 @@ namespace VolumeLight {
     [ExecuteInEditMode]
     public class tkVlit_DrawVolumeLight : MonoBehaviour
     {
+        public static tkVlit_DrawVolumeLight instance { get; private set; }
         CommandBuffer m_commandBuffer;                  // コマンドバッファ。
         Camera m_camera;                                // カメラ。
-        tkVlit_SpotLight[] m_volumeSpotLights;           // ボリュームスポットライト。
         RenderTexture m_backFaceDepthTexture;           // 背面の深度値が書き込まれているテクスチャ。
         RenderTexture m_frontFaceDepthTexture;          // 表面の深度値が書き込まれているテクスチャ。
         int m_depthMapWidth;                            // 深度マップの幅。
         int m_depthMapHeight;                           // 深度マップの高さ。
+        List<tkVlit_SpotLight> m_volumeSpotLightList;   // ボリュームスポットライトのリスト。
         List<Material> m_drawBackFaceMaterialList;      // 背面の深度値描画で使用するマテリアルのリスト。
         List<Material> m_drawFrontFaceMaterialList;     // 表面の深度値描画で使用するマテリアルのリスト。
         List<MeshFilter> m_drawBackMeshFilterList;      // 背面の深度値描画で使用するメッシュフィルターのリスト。
         List<MeshFilter> m_drawFrontMeshFilterList;     // 表面の深度値描画で使用するメッシュフィルターのリスト。
-        List<tkVlit_DrawFinal> m_drawFinals;
+        List<tkVlit_DrawFinal> m_drawFinalList;
 
-        [MenuItem("Component/tkVlit/tkVlit_DrawVolumeLight")]
+        [MenuItem("Component/tkLibU/tkVlit/tkVlit_DrawVolumeLight")]
         static void OnSelectMenu()
         {
             foreach( var go in Selection.gameObjects)
@@ -32,47 +33,82 @@ namespace VolumeLight {
                 go.AddComponent<tkVlit_DrawVolumeLight>();
             }
         }
-        [MenuItem("GameObject/tkVlit/tkVlit_SpotLight")]
+        [MenuItem("GameObject/tkLibU/tkVlit/tkVlit_SpotLight")]
         static void OnAddSpotLight()
         {
+            Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/tkVlit/Prefab/tkVlit_SpotLight.prefab"));
+        }
+        
+        /// <summary>
+        /// スポットライトを追加。
+        /// </summary>
+        /// <param name="spotLight">追加されたスポットライト</param>
+        public void AddSpotLight(tkVlit_SpotLight spotLight)
+        {
+            // 背面の深度値を描画するためのゲームオブジェクトを取得。
+            var trans = spotLight.transform.Find("BackRenderer");
+            // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
+            var meshRenderer = trans.GetComponent<MeshRenderer>();
+            meshRenderer.enabled = false;
+            // マテリアルとメッシュフィルターを集める。
+            m_drawBackFaceMaterialList.Add(meshRenderer.sharedMaterial);
+            m_drawBackMeshFilterList.Add(trans.GetComponent<MeshFilter>());
+
+            // 表面の深度値を描画するためのゲームオブジェクトを取得。
+            trans = spotLight.transform.Find("FrontRenderer");
+            // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
+            meshRenderer = trans.GetComponent<MeshRenderer>();
+            meshRenderer.enabled = false;
+            // マテリアルとメッシュフィルターを集める。
+            m_drawFrontFaceMaterialList.Add(meshRenderer.sharedMaterial);
+            m_drawFrontMeshFilterList.Add(trans.GetComponent<MeshFilter>());
+
+            // 最終描画のゲームオブジェクトを取得。
+            trans = spotLight.transform.Find("FinalRenderer");
+            m_drawFinalList.Add(trans.GetComponent<tkVlit_DrawFinal>());
+
+            m_volumeSpotLightList.Add(spotLight);
+        }
+        /// <summary>
+        /// スポットライトを削除。
+        /// </summary>
+        /// <param name="spotLight">削除するスポットライト。</param>
+        public void RemoveSpotLight(tkVlit_SpotLight spotLight )
+        {
+            for( int i = 0; i < m_volumeSpotLightList.Count; i++)
+            {
+                if( m_volumeSpotLightList[i] == spotLight)
+                {
+                    // 削除。
+                    m_volumeSpotLightList.RemoveAt(i);
+                    m_drawBackFaceMaterialList.RemoveAt(i);
+                    m_drawFrontFaceMaterialList.RemoveAt(i);
+                    m_drawBackMeshFilterList.RemoveAt(i);
+                    m_drawFrontMeshFilterList.RemoveAt(i);
+                    m_drawFinalList.RemoveAt(i);
+                    break;
+                }
+            }
             
+        }
+        private void Awake()
+        {
+            instance = this;
+            m_commandBuffer = new CommandBuffer();
+            m_volumeSpotLightList = new List<tkVlit_SpotLight>();
+            m_drawBackFaceMaterialList = new List<Material>();
+            m_drawFrontFaceMaterialList = new List<Material>();
+            m_drawBackMeshFilterList = new List<MeshFilter>();
+            m_drawFrontMeshFilterList = new List<MeshFilter>();
+            m_drawFinalList = new List<tkVlit_DrawFinal>();
         }
         // Start is called before the first frame update
         void Start()
         {
             m_camera = GetComponent<Camera>();
             m_camera.depthTextureMode = DepthTextureMode.Depth;
-            m_commandBuffer = new CommandBuffer();
-            m_volumeSpotLights = Object.FindObjectsOfType<tkVlit_SpotLight>();
-            m_drawBackFaceMaterialList = new List<Material>();
-            m_drawFrontFaceMaterialList = new List<Material>();
-            m_drawBackMeshFilterList = new List<MeshFilter>();
-            m_drawFrontMeshFilterList = new List<MeshFilter>();
-            m_drawFinals = new List<tkVlit_DrawFinal>();
-            foreach ( var volumeSpotLight in m_volumeSpotLights)
-            {
-                // 背面の深度値を描画するためのゲームオブジェクトを取得。
-                var trans = volumeSpotLight.transform.Find("BackRenderer");
-                // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
-                var meshRenderer = trans.GetComponent<MeshRenderer>();
-                meshRenderer.enabled = false;
-                // マテリアルとメッシュフィルターを集める。
-                m_drawBackFaceMaterialList.Add(meshRenderer.sharedMaterial);
-                m_drawBackMeshFilterList.Add(trans.GetComponent<MeshFilter>());
-
-                // 表面の深度値を描画するためのゲームオブジェクトを取得。
-                trans = volumeSpotLight.transform.Find("FrontRenderer");
-                // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
-                meshRenderer = trans.GetComponent<MeshRenderer>();
-                meshRenderer.enabled = false;
-                // マテリアルとメッシュフィルターを集める。
-                m_drawFrontFaceMaterialList.Add(meshRenderer.sharedMaterial);
-                m_drawFrontMeshFilterList.Add(trans.GetComponent<MeshFilter>());
-
-                // 最終描画のゲームオブジェクトを取得。
-                trans = volumeSpotLight.transform.Find("FinalRenderer");
-                m_drawFinals.Add(trans.GetComponent<tkVlit_DrawFinal>());
-            }
+            
+           
             // 深度マップを生成
             m_depthMapWidth = Screen.width;
             m_depthMapHeight = Screen.height;
@@ -128,12 +164,12 @@ namespace VolumeLight {
                 
                 m_commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
 
-                m_drawFinals[litNo].Draw(
+                m_drawFinalList[litNo].Draw(
                     m_camera,
                     m_frontFaceDepthTexture,
                     m_backFaceDepthTexture,
                     m_commandBuffer,
-                    m_volumeSpotLights[litNo].volumeSpotLightData
+                    m_volumeSpotLightList[litNo].volumeSpotLightData
                 );
 
             }
