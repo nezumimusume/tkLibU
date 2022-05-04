@@ -1,5 +1,5 @@
 # tkLibU
-tkLibUは河原電子ビジネス専門学校での使用を目的に開発している、Unity向けのライブラリです。</br>
+tkLibUは河原電子ビジネス専門学校での使用を目的に開発しているUnity向けのライブラリです。</br>
 今後機能を追加予定です。
 
 ## 1. tkVlit(tk Volume Light)
