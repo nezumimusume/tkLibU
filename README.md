@@ -14,11 +14,12 @@ tkLibUは河原電子ビジネス専門学校での使用を目的に開発し�
 アルゴリズムの詳細は下記ページを参照してください。</br>
 http://maverickproj.web.fc2.com/pg44.html
 
-### 1.2 使用方法
-1. シーンをレンダリングしているメインカメラにtkVlit_DrawVolumeLightコンポーネントを追加(Component/tkLibU/tkVlit/tkVlit_DrawVolumeLight)
-2. シーンにスポットライトのゲームオブジェクトを追加(GameObject/tkLibU/tkVlit/tkVlit_SpotLight)
+### 1.2 実装概要
+CommandBufferを利用して実装されており、シーンをレンダリングしているカメラの半透明描画(フォワードレンダリングのパス)が実行される直前にボリュームライトを描画する描画コマンドが実行されている。CommandBufferを構築している処理はtkVlit_DrawVolumeLight::OnPreRender()関数に記載されている。
 
-操作方法は下記動画を参照</br>
+### 1.2 使用方法
+下記動画を参照</br>
+https://youtu.be/Y8Wgt_oHqcM
 
 ### 1.3 動作確認環境
 Unityのデフォルトレンダリングパイプラインのフォワードレンダリングでのみ動作確認済み(Windows)。
