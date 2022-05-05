@@ -45,28 +45,33 @@ namespace VolumeLight {
         /// <param name="spotLight">追加されたスポットライト</param>
         public void AddSpotLight(tkVlit_SpotLight spotLight)
         {
-            // 背面の深度値を描画するためのゲームオブジェクトを取得。
-            var trans = spotLight.transform.Find("BackRenderer");
-            // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
-            var meshRenderer = trans.GetComponent<MeshRenderer>();
-            meshRenderer.enabled = false;
-            // マテリアルとメッシュフィルターを集める。
-            m_drawBackFaceMaterialList.Add(meshRenderer.sharedMaterial);
-            m_drawBackMeshFilterList.Add(trans.GetComponent<MeshFilter>());
-
-            // 表面の深度値を描画するためのゲームオブジェクトを取得。
-            trans = spotLight.transform.Find("FrontRenderer");
-            // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
-            meshRenderer = trans.GetComponent<MeshRenderer>();
-            meshRenderer.enabled = false;
-            // マテリアルとメッシュフィルターを集める。
-            m_drawFrontFaceMaterialList.Add(meshRenderer.sharedMaterial);
-            m_drawFrontMeshFilterList.Add(trans.GetComponent<MeshFilter>());
-
-            // 最終描画のゲームオブジェクトを取得。
-            trans = spotLight.transform.Find("FinalRenderer");
-            m_drawFinalList.Add(trans.GetComponent<tkVlit_DrawFinal>());
-
+            // 背面の深度値描画に関する初期化処理。
+            {
+                var trans = spotLight.transform.Find("BackRenderer");
+                // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
+                var meshRenderer = trans.GetComponent<MeshRenderer>();
+                meshRenderer.enabled = false;
+                // Unityのレンダリングパイプライン外で描画するためにはマテリアルとメッシュフィルターが必要なので、
+                // リストに追加する。
+                m_drawBackFaceMaterialList.Add(meshRenderer.sharedMaterial);
+                m_drawBackMeshFilterList.Add(trans.GetComponent<MeshFilter>());
+            }
+            // 表面の深度値描画に関する初期化処理。
+            {
+                var trans = spotLight.transform.Find("FrontRenderer");
+                // Unityのレンダリングパイプラインでは描画しないので、MeshRendererを無効にする。
+                var meshRenderer = trans.GetComponent<MeshRenderer>();
+                meshRenderer.enabled = false;
+                // Unityのレンダリングパイプライン外で描画するためにはマテリアルとメッシュフィルターが必要なので、
+                // リストに追加する。
+                m_drawFrontFaceMaterialList.Add(meshRenderer.sharedMaterial);
+                m_drawFrontMeshFilterList.Add(trans.GetComponent<MeshFilter>());
+            }
+            // 最終描画に関する初期化処理。
+            { 
+                var trans = spotLight.transform.Find("FinalRenderer");
+                m_drawFinalList.Add(trans.GetComponent<tkVlit_DrawFinal>());
+            }
             m_volumeSpotLightList.Add(spotLight);
         }
         /// <summary>
@@ -79,7 +84,6 @@ namespace VolumeLight {
             {
                 if( m_volumeSpotLightList[i] == spotLight)
                 {
-                    // 削除。
                     m_volumeSpotLightList.RemoveAt(i);
                     m_drawBackFaceMaterialList.RemoveAt(i);
                     m_drawFrontFaceMaterialList.RemoveAt(i);
@@ -112,7 +116,12 @@ namespace VolumeLight {
             // 深度マップを生成
             m_depthMapWidth = Screen.width;
             m_depthMapHeight = Screen.height;
-            m_backFaceDepthTexture = new RenderTexture(m_depthMapWidth, m_depthMapHeight, 0, RenderTextureFormat.RHalf);
+            m_backFaceDepthTexture = new RenderTexture(
+                m_depthMapWidth, 
+                m_depthMapHeight, 
+                /*depth = */0,
+                RenderTextureFormat.RHalf
+            );
             m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
         }
         // Update is called once per frame
@@ -127,14 +136,20 @@ namespace VolumeLight {
                 m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
             }
 
-            // カメラターゲットのテクスチャを一時テクスチャにコピーする。
+            // ボリュームライトの最終描画でメインシーンの描画結果のテクスチャを利用したいのだが、
+            // レンダリングターゲットとして指定されているテクスチャを読み込みで利用することはできないので、
+            // 一時的なレンダリングターゲットを取得してそこにコピーする。
             int cameraTargetTextureID = Shader.PropertyToID("cameraTargetTexture");
-            // 一時的なレンダテクスチャを作成
-            m_commandBuffer.GetTemporaryRT(cameraTargetTextureID, -1, -1, 0, FilterMode.Bilinear);
-            // CameraTargetを一時的なレンダテクスチャコピー。
+            m_commandBuffer.GetTemporaryRT(
+                cameraTargetTextureID, 
+                /*width=*/-1,  // -1ならCamera pixel widthと同じになる。
+                /*height=*/-1, // -1ならCamera pixel heightと同じになる。
+                /*depth=*/0,   
+                FilterMode.Bilinear
+            );
             m_commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, cameraTargetTextureID);
 
-            
+            // 全てにボリュームライトを描画していく。
             for ( int litNo = 0; litNo < m_drawBackFaceMaterialList.Count; litNo++)
             {
                 Matrix4x4 mWorld = Matrix4x4.TRS(

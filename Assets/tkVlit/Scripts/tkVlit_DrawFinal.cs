@@ -22,7 +22,7 @@ namespace VolumeLight
         public Vector3 directionInView;    // カメラ空間での射出方向。
         public Vector3 rangePow;           // 距離による光の影響率に累乗するパラメーター。1.0で線形の変化をする。
                                            // xが一つ目のカラー、yが二つ目のカラー、zが三つ目のカラー。
-        public Vector3 angle;              // 射出角度(単位：ラジアン。xが一つ目のカラー、yが二つ目のカラー、zが三つ目のカラー)。
+        public Vector3 halfAngleRad;       // 射出角度(単位：ラジアン。xが一つ目のカラー、yが二つ目のカラー、zが三つ目のカラー)。
         public Vector3 anglePow;           // スポットライトとの角度による光の影響率に累乗するパラメータ。1.0で線形に変化する。
                                            // xが一つ目のカラー、yが二つ目のカラー、zが三つ目のカラー。
     };

@@ -90,9 +90,9 @@ namespace VolumeLight
             m_data.color3.y = color3.g;
             m_data.color3.z = color3.b;
 
-            m_data.angle.x = Mathf.Deg2Rad * angle1 * 0.5f;
-            m_data.angle.y = Mathf.Deg2Rad * angle2 * 0.5f;
-            m_data.angle.z = Mathf.Deg2Rad * angle3 * 0.5f;
+            m_data.halfAngleRad.x = Mathf.Deg2Rad * angle1 * 0.5f;
+            m_data.halfAngleRad.y = Mathf.Deg2Rad * angle2 * 0.5f;
+            m_data.halfAngleRad.z = Mathf.Deg2Rad * angle3 * 0.5f;
 
             m_data.anglePow.x = anglePow1;
             m_data.anglePow.y = anglePow2;
@@ -106,10 +106,14 @@ namespace VolumeLight
             m_data.rangePow.y = rangePow2;
             m_data.rangePow.z = rangePow3;
 
+            // スポットライトの射出距離と射出角度からスポットライトコーンモデルの拡大率を計算する。
             float maxRange = Mathf.Max( range1, range2, range3 );
-            float maxAngle = Mathf.Max( m_data.angle.x, m_data.angle.y, m_data.angle.z ) ;
+            float maxHalfAngle = Mathf.Max( m_data.halfAngleRad.x, m_data.halfAngleRad.y, m_data.halfAngleRad.z ) ;
+            // スポットライトで射出角度(ハーフ)が90度を超えてはだめなので、制限をかける。
+            maxHalfAngle = Mathf.Min(Mathf.PI * 0.49f, maxHalfAngle);
+            float xyScale = Mathf.Tan(maxHalfAngle) * maxRange;
+
             Vector3 scale;
-            float xyScale = Mathf.Tan(Mathf.Min(Mathf.PI * 0.49f, maxAngle)) * maxRange;
             scale.x = xyScale;
             scale.y = xyScale;
             scale.z = maxRange;
