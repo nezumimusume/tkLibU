@@ -7,11 +7,11 @@ namespace VolumeLight
     [ExecuteInEditMode]
     public class tkVlit_SpotLight : MonoBehaviour
     {
-        VolumeSpotLightData m_data = new VolumeSpotLightData(); // ƒ{ƒŠƒ…[ƒ€ƒXƒ|ƒbƒgƒ‰ƒCƒgƒf[ƒ^B
+        VolumeSpotLightData m_data = new VolumeSpotLightData(); // ãƒœãƒªãƒ¥ãƒ¼ãƒ ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆãƒ‡ãƒ¼ã‚¿ã€‚
         public VolumeSpotLightData volumeSpotLightData { get { return m_data; } } 
-        public int id { private get; set; }     // ƒ{ƒŠƒ…[ƒ€ƒ‰ƒCƒg‚ÌID
-        Material[] m_materialRenderVolumeMap;   // ƒ{ƒŠƒ…[ƒ€ƒ}ƒbƒv‚ğ•`‰æ‚·‚éƒ}ƒeƒŠƒAƒ‹B
-        int m_shaderPropertyId_volumeLightID;   // ƒ{ƒŠƒ…[ƒ€ƒ‰ƒCƒgID‚ÌƒVƒF[ƒ_[ID
+        public int id { private get; set; }     // ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒ©ã‚¤ãƒˆã®ID
+        Material[] m_materialRenderVolumeMap;   // ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒãƒƒãƒ—ã‚’æç”»ã™ã‚‹ãƒãƒ†ãƒªã‚¢ãƒ«ã€‚
+        int m_shaderPropertyId_volumeLightID;   // ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒ©ã‚¤ãƒˆIDã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ID
                                                 // Start is called before the first frame update
         [ColorUsage(false, true), SerializeField] private Color color1 = Color.white;
         [ColorUsage(false, true), SerializeField] private Color color2;
@@ -68,7 +68,7 @@ namespace VolumeLight
         // Update is called once per frame
         void Update()
         {
-            // ID‚ğŠ„‚è“–‚Ä‚éB
+            // IDã‚’å‰²ã‚Šå½“ã¦ã‚‹ã€‚
             //AssignIDToVolueLight.instance.AssignIDToVolumeLight(this);
             //foreach (var material in m_materialRenderVolumeMap)
             //{
@@ -106,10 +106,10 @@ namespace VolumeLight
             m_data.rangePow.y = rangePow2;
             m_data.rangePow.z = rangePow3;
 
-            // ƒXƒ|ƒbƒgƒ‰ƒCƒg‚ÌËo‹——£‚ÆËoŠp“x‚©‚çƒXƒ|ƒbƒgƒ‰ƒCƒgƒR[ƒ“ƒ‚ƒfƒ‹‚ÌŠg‘å—¦‚ğŒvZ‚·‚éB
+            // ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã®å°„å‡ºè·é›¢ã¨å°„å‡ºè§’åº¦ã‹ã‚‰ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã‚³ãƒ¼ãƒ³ãƒ¢ãƒ‡ãƒ«ã®æ‹¡å¤§ç‡ã‚’è¨ˆç®—ã™ã‚‹ã€‚
             float maxRange = Mathf.Max( range1, range2, range3 );
             float maxHalfAngle = Mathf.Max( m_data.halfAngleRad.x, m_data.halfAngleRad.y, m_data.halfAngleRad.z ) ;
-            // ƒXƒ|ƒbƒgƒ‰ƒCƒg‚ÅËoŠp“x(ƒn[ƒt)‚ª90“x‚ğ’´‚¦‚Ä‚Í‚¾‚ß‚È‚Ì‚ÅA§ŒÀ‚ğ‚©‚¯‚éB
+            // ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã§å°„å‡ºè§’åº¦(ãƒãƒ¼ãƒ•)ãŒ90åº¦ã‚’è¶…ãˆã¦ã¯ã ã‚ãªã®ã§ã€åˆ¶é™ã‚’ã‹ã‘ã‚‹ã€‚
             maxHalfAngle = Mathf.Min(Mathf.PI * 0.49f, maxHalfAngle);
             float xyScale = Mathf.Tan(maxHalfAngle) * maxRange;
 

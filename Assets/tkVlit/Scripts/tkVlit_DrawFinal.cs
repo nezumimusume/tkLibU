@@ -50,9 +50,32 @@ namespace VolumeLight
         VolumeSpotLightData[] m_volumeSpotLightDataArray = new VolumeSpotLightData[1];
         GraphicsBuffer m_volumeSpotLightDataGraphicsBuffer;
 
-        private void OnDestroy()
+        void ReleaseUnmanagedResoruce()
         {
             DestroyImmediate(m_material);
+            m_material = null;
+            if (m_volumeSpotLightDataGraphicsBuffer != null)
+            {
+                m_volumeSpotLightDataGraphicsBuffer.Release();
+
+                m_volumeSpotLightDataGraphicsBuffer = null;
+            }
+        }
+        private void OnDestroy()
+        {
+            // OnDisable()が呼ばれないことも想定してOnDestroyでも念の為アンマネージドリソースの解放をする。
+            ReleaseUnmanagedResoruce();
+        }
+        private void OnDisable()
+        {
+            // [ExecuteInEditMode]が指定されているときに、再生ボタンを推して、
+            // エディタモードからゲームモードに切り替わる時に、OnDestroyでm_volumeSpotLightDataGraphicsBufferの解放処理を書いていたのだが、
+            // OnDestroyが呼ばれるタイミングでm_volumeSpotLightDataGraphicsBufferがnullになっており、
+            // m_volumeSpotLightDataGraphicsBuffer.Release関数が呼べなくなっていた。
+            // これが原因で次のフォーラムに報告されているワーニングが出ていた。
+            // https://forum.unity.com/threads/computebuffer-warning-when-component-uses-executeineditmode.844648/
+            // このフォーラムの解決策は解放できているか怪しかったので、採用せずにOnDisableでアンマネージリソースを解放することで解決した。
+            ReleaseUnmanagedResoruce();
         }
         void Start()
         {
@@ -62,6 +85,7 @@ namespace VolumeLight
                 1,
                 Marshal.SizeOf(typeof(VolumeSpotLightData))
             );
+            
             // Unityのデフォルトの描画パスでは描画しないのでメッシュレンダラーを無効にする。
             var meshRenderer = GetComponent<MeshRenderer>();
             meshRenderer.enabled = false;

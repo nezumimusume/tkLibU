@@ -93,7 +93,22 @@ namespace VolumeLight {
                     break;
                 }
             }
-            
+        }
+        void ReleaseUnmanagedResource()
+        {
+            if (m_commandBuffer != null)
+            {
+                m_commandBuffer.Release();
+                m_commandBuffer = null;
+            }
+        }
+        private void OnDestroy()
+        {
+            ReleaseUnmanagedResource();
+        }
+        private void OnDisable()
+        {
+            ReleaseUnmanagedResource();
         }
         private void Awake()
         {
