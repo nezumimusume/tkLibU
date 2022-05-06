@@ -22,6 +22,6 @@ CommandBufferを利用して実装されており、シーンをレンダリン�
 https://youtu.be/Y8Wgt_oHqcM
 
 ### 1.3 動作確認環境
-Unityのデフォルトレンダリングパイプラインのフォワードレンダリングでのみ動作確認済み(Windows)。
-Mac、URP、ディファードレンダリング、iOS、Androidではまだ動作未確認。
+Unityのデフォルトレンダリングパイプラインのフォワードレンダリングでのみ動作確認済み(Windows,Mac)。
+URP、ディファードレンダリング、iOS、Androidではまだ動作未確認。
 今後動作確認後、対応予定。
