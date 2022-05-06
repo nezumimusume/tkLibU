@@ -24,7 +24,7 @@ namespace VolumeLight {
         List<MeshFilter> m_drawBackMeshFilterList;      // 背面の深度値描画で使用するメッシュフィルターのリスト。
         List<MeshFilter> m_drawFrontMeshFilterList;     // 表面の深度値描画で使用するメッシュフィルターのリスト。
         List<tkVlit_DrawFinal> m_drawFinalList;
-
+#if UNITY_EDITOR
         [MenuItem("Component/tkLibU/tkVlit/tkVlit_DrawVolumeLight")]
         static void OnSelectMenu()
         {
@@ -38,7 +38,7 @@ namespace VolumeLight {
         {
             Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/tkVlit/Prefab/tkVlit_SpotLight.prefab"));
         }
-        
+#endif // #if UNITY_EDITOR
         /// <summary>
         /// スポットライトを追加。
         /// </summary>
@@ -142,6 +142,11 @@ namespace VolumeLight {
         // Update is called once per frame
         void OnPreRender()
         {
+            if( m_commandBuffer == null
+                || m_camera == null
+            ){
+                return;
+            }
             if (m_depthMapWidth != Screen.width || m_depthMapHeight != Screen.height)
             {
                 // 画面解像度が変わったので作り直し。
@@ -207,6 +212,12 @@ namespace VolumeLight {
         }
         private void OnPostRender()
         {
+            if (m_commandBuffer == null
+                || m_camera == null
+            )
+            {
+                return;
+            }
             m_camera.RemoveCommandBuffer(CameraEvent.BeforeForwardAlpha, m_commandBuffer);
             m_commandBuffer.Clear();
         }
