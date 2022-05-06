@@ -23,5 +23,5 @@ https://youtu.be/Y8Wgt_oHqcM
 
 ### 1.3 動作確認環境
 Unityのデフォルトレンダリングパイプライン(フォワード、ディファード共に確認)でのみ動作確認済み(Windows,Mac)。</br>
-URP、ディファードレンダリング、iOS、Androidではまだ動作未確認。
+URP、iOS、Androidではまだ動作未確認。
 今後動作確認後、対応予定。
