@@ -123,6 +123,15 @@ namespace VolumeLight
             m_material.SetFloat(m_shaderPropToId.randomSeedID, Random.Range(0.0f, 1.0f));
             m_material.SetBuffer(m_shaderPropToId.volumeSpotLightArrayID, m_volumeSpotLightDataGraphicsBuffer);
 
+            if (camera.actualRenderingPath == RenderingPath.DeferredShading)
+            {
+                //
+                m_material.EnableKeyword("TK_DEFERRED_PASS");
+            }
+            else
+            {
+                m_material.DisableKeyword("TK_DEFERRED_PASS");
+            }
             // ドロー。
             commandBuffer.DrawMesh(
                  m_meshFilter.sharedMesh,

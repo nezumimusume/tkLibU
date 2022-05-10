@@ -53,6 +53,15 @@ namespace VolumeLight {
                 meshRenderer.enabled = false;
                 // Unityのレンダリングパイプライン外で描画するためにはマテリアルとメッシュフィルターが必要なので、
                 // リストに追加する。
+                if (m_camera.actualRenderingPath == RenderingPath.DeferredShading)
+                {
+                    //
+                    meshRenderer.sharedMaterial.EnableKeyword("TK_DEFERRED_PASS");
+                }
+                else
+                {
+                    meshRenderer.sharedMaterial.DisableKeyword("TK_DEFERRED_PASS");
+                }
                 m_drawBackFaceMaterialList.Add(meshRenderer.sharedMaterial);
                 m_drawBackMeshFilterList.Add(trans.GetComponent<MeshFilter>());
             }
@@ -64,6 +73,15 @@ namespace VolumeLight {
                 meshRenderer.enabled = false;
                 // Unityのレンダリングパイプライン外で描画するためにはマテリアルとメッシュフィルターが必要なので、
                 // リストに追加する。
+                if ( m_camera.actualRenderingPath == RenderingPath.DeferredShading)
+                {
+                    //
+                    meshRenderer.sharedMaterial.EnableKeyword("TK_DEFERRED_PASS");
+                }
+                else
+                {
+                    meshRenderer.sharedMaterial.DisableKeyword("TK_DEFERRED_PASS");
+                }
                 m_drawFrontFaceMaterialList.Add(meshRenderer.sharedMaterial);
                 m_drawFrontMeshFilterList.Add(trans.GetComponent<MeshFilter>());
             }
@@ -113,6 +131,8 @@ namespace VolumeLight {
         private void Awake()
         {
             instance = this;
+            m_camera = GetComponent<Camera>();
+            m_camera.depthTextureMode = DepthTextureMode.Depth;
             m_commandBuffer = new CommandBuffer();
             m_volumeSpotLightList = new List<tkVlit_SpotLight>();
             m_drawBackFaceMaterialList = new List<Material>();
@@ -123,11 +143,7 @@ namespace VolumeLight {
         }
         // Start is called before the first frame update
         void Start()
-        {
-            m_camera = GetComponent<Camera>();
-            m_camera.depthTextureMode = DepthTextureMode.Depth;
-            
-           
+        {           
             // 深度マップを生成
             m_depthMapWidth = Screen.width;
             m_depthMapHeight = Screen.height;

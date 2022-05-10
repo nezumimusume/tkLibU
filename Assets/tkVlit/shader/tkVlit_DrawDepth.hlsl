@@ -4,7 +4,9 @@
 #pragma vertex vert
 #pragma fragment frag
 #pragma enable_d3d11_debug_symbols
+
 #include "UnityCG.cginc"
+#include "Assets/tkLibU_Common/shader/tkLibU_Util.hlsl"
 
 sampler2D _CameraDepthTexture;
 int volumeLightID;  // 描画するボリュームライトのID。
@@ -33,9 +35,7 @@ v2f vert(appdata v)
 
 half frag(v2f i) : SV_Target
 {
-    float2 uv = i.posInProj.xy / i.posInProj.w;
-    uv *= float2(0.5f, -0.5f);
-    uv += 0.5f;
+    float2 uv = CalcUVCoordFromClipInDxSpace(i.posInProj);
     half z = tex2D(_CameraDepthTexture, uv );
     z = max(i.vertex.z, z);
     return z;
