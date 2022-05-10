@@ -61,7 +61,6 @@ Shader "tkVlit/DrawFinal"
             {
                 v2f o;
                 o.vertex = v.vertex;
-                o.vertex.y *= -1.0f;
                 o.vertex.z = 1.0f;
                 o.vertex.w = 1.0f;
                 o.posInProj = o.vertex;
@@ -89,9 +88,21 @@ Shader "tkVlit/DrawFinal"
             }
             fixed4 frag(v2f i) : SV_Target
             {
-                
+                // 各種UV座標の計算。
+                // モバイルで使用されているAPI(OpenGLES、Metal)とWindows系(DirectX)とではクリップ座標系が異なっている(上下逆)
+                // になっているので、深度値が書き込まれているテクスチャの上下が反転しているため、UV座標の計算を分岐させる。
+                // しかし、m_commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, cameraTargetTextureID);で
+                // コピーして作成したカメラターゲットが描画したテクスチャはWindows系の空間に戻されているっぽいので、
+                // Windows系と同じ計算をしている。
                 float2 uv = i.posInProj.xy / i.posInProj.w;
+                float2 albedoUV = uv;
+                albedoUV *= float2(0.5f, -0.5f);
+                albedoUV += 0.5f;
+#if defined(SHADER_API_D3D11 ) || defined(SHADER_API_D3D11_9X) || defined(SHADER_API_GLCORE)    // todo SHADER_API_GLCOREがmacOS???
                 uv *= float2(0.5f, -0.5f);
+#else
+                uv *= float2(0.5f, 0.5f);
+#endif
                 uv += 0.5f;
                 
                 // 
@@ -112,7 +123,7 @@ Shader "tkVlit/DrawFinal"
                 // ボリュームがない箇所はピクセルキル。
                 clip(volume - 0.001f);
                 
-                half4 albedoColor = tex2D(cameraTargetTexture, uv);
+                half4 albedoColor = tex2D(cameraTargetTexture, albedoUV);
 
                 // 距離による光の影響率を計算。
                 float3 ligDir = (volumeCenterPos - spotLight.position);
