@@ -22,6 +22,13 @@ CommandBufferを利用して実装されており、シーンをレンダリン�
 https://youtu.be/Y8Wgt_oHqcM
 
 ### 1.3 動作確認環境
-Unityのデフォルトレンダリングパイプライン(フォワード、ディファード共に確認)でのみ動作確認済み(Windows,Mac,Android)。</br>
-URP、iOSではまだ動作未確認。
-今後動作確認後、対応予定。
+下記の環境で動作確認済み</br>
+**レンダリングパイプライン**>/br>
+　ビルトインパイプライン(フォワード、ディファ―ド)
+**プラットフォーム**</br>
+　Windows( GTX1060,RTX3070 )
+　Android( Pixel 6 Pro, Pixel 3 )
+　Mac( M1 macbook pro )
+　iOS( iPad第6世代 )
+
+URPまだ動作未確認。
