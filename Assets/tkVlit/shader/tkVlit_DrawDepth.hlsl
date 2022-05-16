@@ -35,7 +35,7 @@ v2f vert(appdata v)
 
 half frag(v2f i) : SV_Target
 {
-    float2 uv = CalcUVCoordFromClipInDxSpace(i.posInProj);
+    float2 uv = CalcUVCoordFromClip(i.posInProj);
     half z = tex2D(_CameraDepthTexture, uv );
     z = max(i.vertex.z, z);
     return z;

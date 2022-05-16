@@ -1,4 +1,4 @@
-// #define DRAW_FINAL_DOWN_SCALE   // 定義で最終描画をダウンスケールする。
+#define DRAW_FINAL_DOWN_SCALE   // 定義で最終描画をダウンスケールする。
 
 using System.Collections;
 using System.Collections.Generic;
@@ -18,10 +18,12 @@ namespace VolumeLight {
         public static tkVlit_DrawVolumeLight instance { get; private set; }
         CommandBuffer m_commandBuffer;                  // コマンドバッファ。
         Camera m_camera;                                // カメラ。
-        RenderTexture m_backFaceDepthTexture;           // 背面の深度値が書き込まれているテクスチャ。
+        bool m_isInitedRenderTexture = false;           // レンダリングテクスチャの初期化フラグ。
+        public RenderTexture m_backFaceDepthTexture;           // 背面の深度値が書き込まれているテクスチャ。
         RenderTexture m_frontFaceDepthTexture;          // 表面の深度値が書き込まれているテクスチャ。
 #if DRAW_FINAL_DOWN_SCALE
         RenderTexture m_finalTexture;                   // 最終描画結果の書き込み先。
+        public Material m_copyAddMatrial;                      // 加算合成用のマテリアル。
 #endif // #if DRAW_FINAL_DOWN_SCALE
         int m_depthMapWidth;                            // 深度マップの幅。
         int m_depthMapHeight;                           // 深度マップの高さ。
@@ -31,7 +33,6 @@ namespace VolumeLight {
         List<MeshFilter> m_drawBackMeshFilterList;      // 背面の深度値描画で使用するメッシュフィルターのリスト。
         List<MeshFilter> m_drawFrontMeshFilterList;     // 表面の深度値描画で使用するメッシュフィルターのリスト。
         List<tkVlit_DrawFinal> m_drawFinalList;
-        Material m_copyAddMatrial;                      // 加算合成用のマテリアル。
 #if UNITY_EDITOR
         [MenuItem("Component/tkLibU/tkVlit/tkVlit_DrawVolumeLight")]
         static void OnSelectMenu()
@@ -149,23 +150,37 @@ namespace VolumeLight {
             m_drawFrontMeshFilterList = new List<MeshFilter>();
             m_drawFinalList = new List<tkVlit_DrawFinal>();
         }
-        // Start is called before the first frame update
-        void Start()
-        {           
-            // 深度マップを生成
+        
+        void InitRenderTextures()
+        {
             m_depthMapWidth = Screen.width;
             m_depthMapHeight = Screen.height;
+            if(m_isInitedRenderTexture){
+                m_backFaceDepthTexture.Release();
+                m_frontFaceDepthTexture.Release();
+#if DRAW_FINAL_DOWN_SCALE
+                m_finalTexture.Release();
+#endif
+            }
             m_backFaceDepthTexture = new RenderTexture(
                 m_depthMapWidth, 
                 m_depthMapHeight, 
-                /*depth = */0,
+                /*depth=*/0, 
                 RenderTextureFormat.RHalf
             );
-            
+            m_backFaceDepthTexture.antiAliasing = 1;
             m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
 #if DRAW_FINAL_DOWN_SCALE
             m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0, RenderTextureFormat.RGB111110Float);
-            m_copyAddMatrial = new Material(Shader.Find("tkLibU/CopyAdd"));
+            m_finalTexture.antiAliasing = 1;
+#endif // #if DRAW_FINAL_DOWN_SCALE
+            m_isInitedRenderTexture = true;
+        }
+        // Start is called before the first frame update
+        void Start()
+        {    
+            InitRenderTextures();            
+#if DRAW_FINAL_DOWN_SCALE
             m_copyAddMatrial.SetTexture("srcTexture", m_finalTexture);
 #endif // #if DRAW_FINAL_DOWN_SCALE
         }
@@ -179,14 +194,8 @@ namespace VolumeLight {
             }
           　if (m_depthMapWidth != Screen.width || m_depthMapHeight != Screen.height)
             {
-                // 画面解像度が変わったので作り直し。
-                m_depthMapWidth = Screen.width;
-                m_depthMapHeight = Screen.height;
-                m_backFaceDepthTexture = new RenderTexture(m_depthMapWidth, m_depthMapHeight, 0, RenderTextureFormat.RHalf);
-                m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
-#if DRAW_FINAL_DOWN_SCALE
-                m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0, RenderTextureFormat.RGB111110Float);
-#endif // #if DRAW_FINAL_DOWN_SCALE
+                // 画面解像度が変わったのでレンダーテクスチャを作り直す。
+                InitRenderTextures();
             }
 
             // ボリュームライトの最終描画でメインシーンの描画結果のテクスチャを利用したいのだが、
@@ -251,8 +260,20 @@ namespace VolumeLight {
             }
 #if DRAW_FINAL_DOWN_SCALE
             m_commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-            m_commandBuffer.Blit(m_finalTexture, BuiltinRenderTextureType.CameraTarget, m_copyAddMatrial);
+            if(m_drawFinalList != null
+                && m_drawFinalList.Count > 0
+                && m_copyAddMatrial != null
+            )
+            {
+                m_commandBuffer.DrawMesh(
+                    m_drawFinalList[0].planeMeshFilter.sharedMesh,
+                    Matrix4x4.identity,
+                    m_copyAddMatrial
+                );
+            }
+            //m_commandBuffer.Blit(m_finalTexture, BuiltinRenderTextureType.CameraTarget, m_copyAddMatrial);
 #endif // #if DRAW_FINAL_DOWN_SCALE
+            m_camera.forceIntoRenderTexture = true;
             m_camera.AddCommandBuffer(CameraEvent.BeforeForwardAlpha, m_commandBuffer);
         }
         private void OnPostRender()

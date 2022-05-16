@@ -49,7 +49,8 @@ namespace VolumeLight
         ShaderPropertyToID m_shaderPropToId = new ShaderPropertyToID();
         VolumeSpotLightData[] m_volumeSpotLightDataArray = new VolumeSpotLightData[1];
         GraphicsBuffer m_volumeSpotLightDataGraphicsBuffer;
-
+        
+        public MeshFilter planeMeshFilter{get{ return m_meshFilter;} }
         void ReleaseUnmanagedResoruce()
         {
             DestroyImmediate(m_material);

@@ -33,7 +33,9 @@ Shader "tkLibU/CopyAdd"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.vertex = v.vertex;
+                o.vertex.z = 1.0f;
+                o.vertex.w = 1.0f;
                 o.posInProj = o.vertex;
                 return o;
             }

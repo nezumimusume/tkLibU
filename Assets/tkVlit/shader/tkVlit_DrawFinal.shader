@@ -94,7 +94,7 @@ Shader "tkVlit/DrawFinal"
                
                 // 各種UV座標の計算。
                 float2 uv = CalcUVCoordFromClip(i.posInProj);
-                float2 albedoUV = CalcUVCoordFromClipInDxSpace(i.posInProj);
+                float2 albedoUV = CalcUVCoordFromClip(i.posInProj);
                 
                 // 
                 half volumeFrontZ = tex2D(volumeFrontTexture, uv).r;

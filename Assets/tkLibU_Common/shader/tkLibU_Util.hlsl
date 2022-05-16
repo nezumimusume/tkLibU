@@ -6,20 +6,22 @@
 inline float2 CalcUVCoordFromClip(float4 coordInClipSpace )
 {
     float2 uv = coordInClipSpace.xy / coordInClipSpace.w;
-
+    // todo androidのディファードのパスで要動作確認。
     uv *= float2(0.5f, 0.5f * _ProjectionParams.x);
 
     uv += 0.5f;
 
     return uv;
 }
-// DirectX系のクリップ空間からのUV座標を計算する。
-// 深度テクスチャなどのユーザー定義のレンダリングテクスチャ以外はDirectX系のクリップ空間に変換されているっぽい？
-inline float2 CalcUVCoordFromClipInDxSpace(float4 coordInClipSpace)
+
+// クリップ空間からUV座標を計算する。
+// この関数は上下反転していないテクスチャで利用する。
+inline float2 CalcUVCoordFromClip_NoVFlipTexture(float4 coordInClipSpace)
 {
     float2 uv = coordInClipSpace.xy / coordInClipSpace.w;
     uv *= float2(0.5f, -0.5f);
     uv += 0.5f;
+
     return uv;
 }
 
