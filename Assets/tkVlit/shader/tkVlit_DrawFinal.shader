@@ -89,8 +89,9 @@ Shader "tkVlit/DrawFinal"
             {
                 return frac(sin(dot(texCoord.xy, float2(12.9898, 78.233)) + Seed) * 43758.5453);
             }
-            fixed4 frag(v2f i) : SV_Target
+            half4 frag(v2f i) : SV_Target
             {
+               
                 // 各種UV座標の計算。
                 float2 uv = CalcUVCoordFromClip(i.posInProj);
                 float2 albedoUV = CalcUVCoordFromClipInDxSpace(i.posInProj);

@@ -48,8 +48,10 @@ namespace VolumeLight
 
         void Start()
         {
-            tkVlit_DrawVolumeLight.instance.AddSpotLight(this);
-
+            if (tkVlit_DrawVolumeLight.instance != null)
+            {
+                tkVlit_DrawVolumeLight.instance.AddSpotLight(this);
+            }
             var meshRendererArray = transform.GetComponentsInChildren<MeshRenderer>();
             m_materialRenderVolumeMap = new Material[meshRendererArray.Length];
             for (int i = 0; i < meshRendererArray.Length; i++)

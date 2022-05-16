@@ -1,8 +1,12 @@
+// #define DRAW_FINAL_DOWN_SCALE   // 定義で最終描画をダウンスケールする。
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+
+
 
 namespace VolumeLight {
     /// <summary>
@@ -16,6 +20,9 @@ namespace VolumeLight {
         Camera m_camera;                                // カメラ。
         RenderTexture m_backFaceDepthTexture;           // 背面の深度値が書き込まれているテクスチャ。
         RenderTexture m_frontFaceDepthTexture;          // 表面の深度値が書き込まれているテクスチャ。
+#if DRAW_FINAL_DOWN_SCALE
+        RenderTexture m_finalTexture;                   // 最終描画結果の書き込み先。
+#endif // #if DRAW_FINAL_DOWN_SCALE
         int m_depthMapWidth;                            // 深度マップの幅。
         int m_depthMapHeight;                           // 深度マップの高さ。
         List<tkVlit_SpotLight> m_volumeSpotLightList;   // ボリュームスポットライトのリスト。
@@ -24,6 +31,7 @@ namespace VolumeLight {
         List<MeshFilter> m_drawBackMeshFilterList;      // 背面の深度値描画で使用するメッシュフィルターのリスト。
         List<MeshFilter> m_drawFrontMeshFilterList;     // 表面の深度値描画で使用するメッシュフィルターのリスト。
         List<tkVlit_DrawFinal> m_drawFinalList;
+        Material m_copyAddMatrial;                      // 加算合成用のマテリアル。
 #if UNITY_EDITOR
         [MenuItem("Component/tkLibU/tkVlit/tkVlit_DrawVolumeLight")]
         static void OnSelectMenu()
@@ -153,7 +161,13 @@ namespace VolumeLight {
                 /*depth = */0,
                 RenderTextureFormat.RHalf
             );
+            
             m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
+#if DRAW_FINAL_DOWN_SCALE
+            m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0, RenderTextureFormat.RGB111110Float);
+            m_copyAddMatrial = new Material(Shader.Find("tkLibU/CopyAdd"));
+            m_copyAddMatrial.SetTexture("srcTexture", m_finalTexture);
+#endif // #if DRAW_FINAL_DOWN_SCALE
         }
         // Update is called once per frame
         void OnPreRender()
@@ -163,13 +177,16 @@ namespace VolumeLight {
             ){
                 return;
             }
-            if (m_depthMapWidth != Screen.width || m_depthMapHeight != Screen.height)
+          　if (m_depthMapWidth != Screen.width || m_depthMapHeight != Screen.height)
             {
                 // 画面解像度が変わったので作り直し。
                 m_depthMapWidth = Screen.width;
                 m_depthMapHeight = Screen.height;
                 m_backFaceDepthTexture = new RenderTexture(m_depthMapWidth, m_depthMapHeight, 0, RenderTextureFormat.RHalf);
                 m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
+#if DRAW_FINAL_DOWN_SCALE
+                m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0, RenderTextureFormat.RGB111110Float);
+#endif // #if DRAW_FINAL_DOWN_SCALE
             }
 
             // ボリュームライトの最終描画でメインシーンの描画結果のテクスチャを利用したいのだが、
@@ -184,7 +201,14 @@ namespace VolumeLight {
                 FilterMode.Bilinear
             );
             m_commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, cameraTargetTextureID);
-
+#if DRAW_FINAL_DOWN_SCALE
+            m_commandBuffer.SetRenderTarget(m_finalTexture);
+            m_commandBuffer.ClearRenderTarget(
+                /*clearDepth=*/true,
+                /*clearColor=*/true,
+                Color.black
+            );
+#endif // #if DRAW_FINAL_DOWN_SCALE
             // 全てにボリュームライトを描画していく。
             for ( int litNo = 0; litNo < m_drawBackFaceMaterialList.Count; litNo++)
             {
@@ -212,9 +236,11 @@ namespace VolumeLight {
                     mWorld,
                     m_drawFrontFaceMaterialList[litNo]
                 );
-                
+#if DRAW_FINAL_DOWN_SCALE
+                m_commandBuffer.SetRenderTarget(m_finalTexture);
+#else // #if DRAW_FINAL_DOWN_SCALE
                 m_commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-
+#endif // #if DRAW_FINAL_DOWN_SCALE
                 m_drawFinalList[litNo].Draw(
                     m_camera,
                     m_frontFaceDepthTexture,
@@ -222,8 +248,11 @@ namespace VolumeLight {
                     m_commandBuffer,
                     m_volumeSpotLightList[litNo].volumeSpotLightData
                 );
-
             }
+#if DRAW_FINAL_DOWN_SCALE
+            m_commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
+            m_commandBuffer.Blit(m_finalTexture, BuiltinRenderTextureType.CameraTarget, m_copyAddMatrial);
+#endif // #if DRAW_FINAL_DOWN_SCALE
             m_camera.AddCommandBuffer(CameraEvent.BeforeForwardAlpha, m_commandBuffer);
         }
         private void OnPostRender()

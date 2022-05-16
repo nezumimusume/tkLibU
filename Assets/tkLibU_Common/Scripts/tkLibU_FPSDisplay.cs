@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class tkLibU_FPSDisplay : MonoBehaviour
 {
-    // •Ï”
+    // å¤‰æ•°
     int frameCount;
     float prevTime;
     float fps;
 
-    // ‰Šú‰»ˆ—
+    // åˆæœŸåŒ–å‡¦ç†
     void Start()
     {
         Application.targetFrameRate = 60;
-        // •Ï”‚Ì‰Šú‰»
+        // å¤‰æ•°ã®åˆæœŸåŒ–
         frameCount = 0;
         prevTime = 0.0f;
     }
 
-    // XVˆ—
+    // æ›´æ–°å‡¦ç†
     void Update()
     {
         frameCount++;
@@ -34,7 +34,7 @@ public class tkLibU_FPSDisplay : MonoBehaviour
         }
     }
 
-    // •\¦ˆ—
+    // è¡¨ç¤ºå‡¦ç†
     private void OnGUI()
     {
         var styleState = new GUIStyleState();
@@ -45,6 +45,8 @@ public class tkLibU_FPSDisplay : MonoBehaviour
         GUILayout.BeginArea(new Rect(50, 50, 400, 150));
         string text = string.Format("FPS = {0:F2}", fps);
         GUILayout.Label(text, style);
+        string useAPIName = string.Format("API = {0}", SystemInfo.graphicsDeviceType.ToString());
+        GUILayout.Label(useAPIName, style);
         GUILayout.EndArea();
     }
 }
