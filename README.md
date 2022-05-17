@@ -27,7 +27,7 @@ https://youtu.be/Y8Wgt_oHqcM
 　ビルトインパイプライン(フォワード、ディファ―ド)</br>
 **プラットフォーム**</br>
 　Windows( GTX1060,RTX3070 )</br>
-　Android( Pixel 6 Pro, Pixel 3 )</br>
+　Android( Pixel 6 Pro, Pixel 3, Xperia SO-03J )</br>
 　Mac( M1 macbook pro )</br>
 　iOS( iPad第6世代 )</br>
 
