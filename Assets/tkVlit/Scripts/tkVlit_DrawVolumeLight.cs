@@ -19,11 +19,11 @@ namespace VolumeLight {
         CommandBuffer m_commandBuffer;                  // コマンドバッファ。
         Camera m_camera;                                // カメラ。
         bool m_isInitedRenderTexture = false;           // レンダリングテクスチャの初期化フラグ。
-        public RenderTexture m_backFaceDepthTexture;           // 背面の深度値が書き込まれているテクスチャ。
+        public RenderTexture m_backFaceDepthTexture;    // 背面の深度値が書き込まれているテクスチャ。
         RenderTexture m_frontFaceDepthTexture;          // 表面の深度値が書き込まれているテクスチャ。
 #if DRAW_FINAL_DOWN_SCALE
         RenderTexture m_finalTexture;                   // 最終描画結果の書き込み先。
-        public Material m_copyAddMatrial;                      // 加算合成用のマテリアル。
+        tkLibU_AddCopyFullScreen m_addCopyFullScreen;   // 全画面にフルスクリーンコピー。
 #endif // #if DRAW_FINAL_DOWN_SCALE
         int m_depthMapWidth;                            // 深度マップの幅。
         int m_depthMapHeight;                           // 深度マップの高さ。
@@ -34,10 +34,24 @@ namespace VolumeLight {
         List<MeshFilter> m_drawFrontMeshFilterList;     // 表面の深度値描画で使用するメッシュフィルターのリスト。
         List<tkVlit_DrawFinal> m_drawFinalList;
 #if UNITY_EDITOR
+        /// <summary>
+        /// TKLibUの初期化処理。
+        /// </summary>
+        static void InitTKLibU()
+        {
+            var commonObject = GameObject.Find("tkLibU_Common");
+            if(commonObject == null)
+            {
+                // tkLibUの共通オブジェクトが設置されていないのでシーンに追加する。
+                var obj = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/tkLibU_Common/Prefab/tkLibU_Common.prefab"));
+                obj.name = obj.name.Replace("(Clone)", "");
+            }
+        }
         [MenuItem("Component/tkLibU/tkVlit/tkVlit_DrawVolumeLight")]
         static void OnSelectMenu()
         {
-            foreach( var go in Selection.gameObjects)
+            InitTKLibU();
+            foreach ( var go in Selection.gameObjects)
             {
                 go.AddComponent<tkVlit_DrawVolumeLight>();
             }
@@ -45,6 +59,7 @@ namespace VolumeLight {
         [MenuItem("GameObject/tkLibU/tkVlit/tkVlit_SpotLight")]
         static void OnAddSpotLight()
         {
+            InitTKLibU();
             Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/tkVlit/Prefab/tkVlit_SpotLight.prefab"));
         }
 #endif // #if UNITY_EDITOR
@@ -149,6 +164,7 @@ namespace VolumeLight {
             m_drawBackMeshFilterList = new List<MeshFilter>();
             m_drawFrontMeshFilterList = new List<MeshFilter>();
             m_drawFinalList = new List<tkVlit_DrawFinal>();
+            m_addCopyFullScreen = GameObject.FindObjectOfType< tkLibU_AddCopyFullScreen>();
         }
         
         void InitRenderTextures()
@@ -179,10 +195,7 @@ namespace VolumeLight {
         // Start is called before the first frame update
         void Start()
         {    
-            InitRenderTextures();            
-#if DRAW_FINAL_DOWN_SCALE
-            m_copyAddMatrial.SetTexture("srcTexture", m_finalTexture);
-#endif // #if DRAW_FINAL_DOWN_SCALE
+            InitRenderTextures();
         }
         // Update is called once per frame
         void OnPreRender()
@@ -262,13 +275,12 @@ namespace VolumeLight {
             m_commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
             if(m_drawFinalList != null
                 && m_drawFinalList.Count > 0
-                && m_copyAddMatrial != null
-            )
+                && m_addCopyFullScreen != null)
             {
-                m_commandBuffer.DrawMesh(
-                    m_drawFinalList[0].planeMeshFilter.sharedMesh,
-                    Matrix4x4.identity,
-                    m_copyAddMatrial
+                m_addCopyFullScreen.Draw(
+                    m_commandBuffer,
+                    m_finalTexture,
+                    BuiltinRenderTextureType.CameraTarget
                 );
             }
             //m_commandBuffer.Blit(m_finalTexture, BuiltinRenderTextureType.CameraTarget, m_copyAddMatrial);
