@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tkVlit_DrawBackFaceDepth
   m_Shader: {fileID: 4800000, guid: 951f8cc11a92962499b0675730dc26d2, type: 3}
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - TK_DEFERRED_PASS
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
