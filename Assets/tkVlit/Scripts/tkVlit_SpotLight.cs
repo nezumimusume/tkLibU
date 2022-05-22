@@ -48,9 +48,9 @@ namespace VolumeLight
 
         void Start()
         {
-            if (tkVlit_DrawVolumeLight.instance != null)
+            if (tkVlit_DrawVolumeLightBRP.instance != null)
             {
-                tkVlit_DrawVolumeLight.instance.AddSpotLight(this);
+                tkVlit_DrawVolumeLightBRP.instance.AddSpotLight(this);
             }
             var meshRendererArray = transform.GetComponentsInChildren<MeshRenderer>();
             m_materialRenderVolumeMap = new Material[meshRendererArray.Length];
@@ -62,9 +62,9 @@ namespace VolumeLight
         }
         private void OnDestroy()
         {
-            if (tkVlit_DrawVolumeLight.instance != null)
+            if (tkVlit_DrawVolumeLightBRP.instance != null)
             {
-                tkVlit_DrawVolumeLight.instance.RemoveSpotLight(this);
+                tkVlit_DrawVolumeLightBRP.instance.RemoveSpotLight(this);
             }
         }
         // Update is called once per frame
