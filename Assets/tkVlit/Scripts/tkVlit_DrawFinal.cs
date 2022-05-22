@@ -105,6 +105,10 @@ namespace VolumeLight
         
         public void Draw(Camera camera, RenderTexture volumeMapFront, RenderTexture VolumeMapBack, CommandBuffer commandBuffer, VolumeSpotLightData data)
         {
+            if (m_volumeSpotLightDataGraphicsBuffer == null)
+            {
+                return;
+            }
             m_volumeSpotLightDataArray[0] = data;
             m_volumeSpotLightDataGraphicsBuffer.SetData(m_volumeSpotLightDataArray);
             // シェーダーで使用されるプロジェクション行列を取得する。

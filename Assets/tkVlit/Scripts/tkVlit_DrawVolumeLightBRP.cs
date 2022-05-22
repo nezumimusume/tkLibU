@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-
-
+using UnityEngine.Rendering.Universal;
 
 namespace VolumeLight {
     /// <summary>
@@ -48,18 +47,10 @@ namespace VolumeLight {
             Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/tkVlit/Prefab/tkVlit_SpotLight.prefab"));
         }
 #endif // #if UNITY_EDITOR
-        /// <summary>
-        /// スポットライトを追加。
-        /// </summary>
-        /// <param name="spotLight">追加されたスポットライト</param>
         public void AddSpotLight(tkVlit_SpotLight spotLight)
         {
             m_drawVolumeLightCommon?.AddSpotLight(spotLight);
         }
-        /// <summary>
-        /// スポットライトを削除。
-        /// </summary>
-        /// <param name="spotLight">削除するスポットライト。</param>
         public void RemoveSpotLight(tkVlit_SpotLight spotLight )
         {
             m_drawVolumeLightCommon?.RemoveSpotLight(spotLight);
@@ -82,7 +73,7 @@ namespace VolumeLight {
         // Update is called once per frame
         void OnPreRender()
         {
-            var commandBuffer = m_drawVolumeLightCommon?.Draw();
+            var commandBuffer = m_drawVolumeLightCommon?.Draw(BuiltinRenderTextureType.CameraTarget);
             m_camera.forceIntoRenderTexture = true;
             if (commandBuffer != null)
             {

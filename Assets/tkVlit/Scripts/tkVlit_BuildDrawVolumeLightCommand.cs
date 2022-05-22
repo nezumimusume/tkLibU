@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace VolumeLight
 {
@@ -20,7 +21,8 @@ namespace VolumeLight
             List<tkVlit_DrawFinal> drawFinalList,
             List<tkVlit_SpotLight> volumeSpotLightList,
             tkLibU_AddCopyFullScreen addCopyFullScreen,
-            Camera camera
+            Camera camera,
+            RenderTargetIdentifier cameraRenderTargetID
         )
         {
             // ボリュームライトの最終描画でメインシーンの描画結果のテクスチャを利用したいのだが、
@@ -29,13 +31,12 @@ namespace VolumeLight
             int cameraTargetTextureID = Shader.PropertyToID("cameraTargetTexture");
             commandBuffer.GetTemporaryRT(
                 cameraTargetTextureID,
-                /*width=*/-1,  // -1ならCamera pixel widthと同じになる。
-                /*height=*/-1, // -1ならCamera pixel heightと同じになる。
+                camera.pixelWidth,
+                camera.pixelHeight,
                 /*depth=*/0,
                 FilterMode.Bilinear
             );
-            commandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, cameraTargetTextureID);
-
+            commandBuffer.Blit(cameraRenderTargetID, cameraTargetTextureID);
             commandBuffer.SetRenderTarget(renderTextures.finalTexture);
             commandBuffer.ClearRenderTarget(
                 /*clearDepth=*/true,
@@ -70,11 +71,9 @@ namespace VolumeLight
                     mWorld,
                     drawFrontFaceMaterialList[litNo]
                 );
-                // todo #if DRAW_FINAL_DOWN_SCALE
+                
                 commandBuffer.SetRenderTarget(renderTextures.finalTexture);
-                // todo #else // #if DRAW_FINAL_DOWN_SCALE
-                // todo         m_commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-                // todo #endif // #if DRAW_FINAL_DOWN_SCALE
+                
                 drawFinalList[litNo].Draw(
                     camera,
                     renderTextures.frontFaceDepthTexture,
@@ -83,8 +82,8 @@ namespace VolumeLight
                     volumeSpotLightList[litNo].volumeSpotLightData
                 );
             }
-            // todo #if DRAW_FINAL_DOWN_SCALE
-            commandBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
+            
+            commandBuffer.SetRenderTarget(cameraRenderTargetID);
             if (drawFinalList != null
                 && drawFinalList.Count > 0
                 && addCopyFullScreen != null)
@@ -95,8 +94,7 @@ namespace VolumeLight
                     BuiltinRenderTextureType.CameraTarget
                 );
             }
-            //m_commandBuffer.Blit(m_finalTexture, BuiltinRenderTextureType.CameraTarget, m_copyAddMatrial);
-            // todo #endif // #if DRAW_FINAL_DOWN_SCALE
+            commandBuffer.ReleaseTemporaryRT(cameraTargetTextureID);
         }
     }
 

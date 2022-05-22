@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace VolumeLight
 {
@@ -21,10 +22,6 @@ namespace VolumeLight
         List<MeshFilter> m_drawFrontMeshFilterList;     // 表面の深度値描画で使用するメッシュフィルターのリスト。
         List<tkVlit_DrawFinal> m_drawFinalList;
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="camera">カメラ</param>
         public tkVlit_DrawVolumeLightCommon(Camera camera)
         {
             m_camera = camera;
@@ -41,12 +38,12 @@ namespace VolumeLight
             m_renderTextures = new tkVlit_RenderTextures();
             m_renderTextures.Init();
         }
-        /// <summary>
-        /// スポットライトを追加。
-        /// </summary>
-        /// <param name="spotLight">追加されたスポットライト</param>
         public void AddSpotLight(tkVlit_SpotLight spotLight)
         {
+            if (!m_camera)
+            {
+                return;
+            }
             // 背面の深度値描画に関する初期化処理。
             {
                 var trans = spotLight.transform.Find("BackRenderer");
@@ -94,10 +91,6 @@ namespace VolumeLight
             }
             m_volumeSpotLightList.Add(spotLight);
         }
-        /// <summary>
-        /// スポットライトを削除。
-        /// </summary>
-        /// <param name="spotLight">削除するスポットライト。</param>
         public void RemoveSpotLight(tkVlit_SpotLight spotLight)
         {
             for (int i = 0; i < m_volumeSpotLightList.Count; i++)
@@ -114,9 +107,6 @@ namespace VolumeLight
                 }
             }
         }
-        /// <summary>
-        /// 解放処理
-        /// </summary>
         public void Release()
         {
             if (m_commandBuffer != null)
@@ -125,11 +115,7 @@ namespace VolumeLight
                 m_commandBuffer = null;
             }
         }
-        /// <summary>
-        /// 描画
-        /// </summary>
-        /// <returns>構築した描画コマンドバッファ</returns>
-        public CommandBuffer Draw()
+        public CommandBuffer Draw(RenderTargetIdentifier cameraRenderTargetID)
         {
             if (m_commandBuffer == null
                 || m_camera == null
@@ -151,7 +137,8 @@ namespace VolumeLight
                 m_drawFinalList,
                 m_volumeSpotLightList,
                 m_addCopyFullScreen,
-                m_camera
+                m_camera,
+                cameraRenderTargetID
             );
             return m_commandBuffer;
         }

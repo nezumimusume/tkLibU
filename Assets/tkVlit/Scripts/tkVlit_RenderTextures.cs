@@ -48,7 +48,11 @@ public class tkVlit_RenderTextures
     /// </summary>
     public void Init()
     {
-        // 深度テクスチャの幅と高さを初期化。
+        if(Screen.width == 0 || Screen.height == 0)
+        {
+            return;
+        }
+        // 深度テクスチャの幅高さを初期化。
         m_depthMapWidth = Screen.width;
         m_depthMapHeight = Screen.height;
 
@@ -75,7 +79,7 @@ public class tkVlit_RenderTextures
         // 最終描画を行うテクスチャを初期化。
         // モバイルのピクセル処理能力、特にメモリ帯域が厳しいので、
         // レンダリングテクスチャの解像度を1/4にしている。
-        m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0, RenderTextureFormat.RGB111110Float);
+        m_finalTexture = new RenderTexture(m_depthMapWidth/4, m_depthMapHeight/4, 0, RenderTextureFormat.RGB111110Float);
         // こいつもアンチはいらない。
         m_finalTexture.antiAliasing = 1;
 

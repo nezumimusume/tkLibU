@@ -35,7 +35,7 @@ public class tkLibU_AddCopyFullScreen : MonoBehaviour
             return;
         }
         m_addCopyMaterial.SetTexture(m_srcTextureShaderID, srcTexture);
-        commandBuffer.SetRenderTarget(renderTextureType);
+        //commandBuffer.SetRenderTarget(renderTextureType);
         commandBuffer.DrawMesh(
             m_planeMeshFilter.sharedMesh,
             Matrix4x4.identity,

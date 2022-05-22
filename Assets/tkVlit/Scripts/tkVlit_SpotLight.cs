@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace VolumeLight
 {
-    [ExecuteInEditMode]
+        [ExecuteInEditMode]
     public class tkVlit_SpotLight : MonoBehaviour
     {
+        tkVlit_DrawVolumeLightURP drawVolumeLightURPInstance;
         VolumeSpotLightData m_data = new VolumeSpotLightData(); // ボリュームスポットライトデータ。
         public VolumeSpotLightData volumeSpotLightData { get { return m_data; } } 
         public int id { private get; set; }     // ボリュームライトのID
@@ -51,6 +52,10 @@ namespace VolumeLight
             if (tkVlit_DrawVolumeLightBRP.instance != null)
             {
                 tkVlit_DrawVolumeLightBRP.instance.AddSpotLight(this);
+            }else if(tkVlit_DrawVolumeLightURP.instance != null)
+            {
+                tkVlit_DrawVolumeLightURP.instance.AddSpotLight(this);
+                drawVolumeLightURPInstance = tkVlit_DrawVolumeLightURP.instance;
             }
             var meshRendererArray = transform.GetComponentsInChildren<MeshRenderer>();
             m_materialRenderVolumeMap = new Material[meshRendererArray.Length];
@@ -65,17 +70,19 @@ namespace VolumeLight
             if (tkVlit_DrawVolumeLightBRP.instance != null)
             {
                 tkVlit_DrawVolumeLightBRP.instance.RemoveSpotLight(this);
+            }else if (tkVlit_DrawVolumeLightURP.instance != null)
+            {
+                tkVlit_DrawVolumeLightURP.instance.RemoveSpotLight(this);
             }
         }
         // Update is called once per frame
         void Update()
         {
-            // IDを割り当てる。
-            //AssignIDToVolueLight.instance.AssignIDToVolumeLight(this);
-            //foreach (var material in m_materialRenderVolumeMap)
-            //{
-            //    material.SetInt(m_shaderPropertyId_volumeLightID, id);
-            //}
+            if(drawVolumeLightURPInstance != tkVlit_DrawVolumeLightURP.instance)
+            {
+                tkVlit_DrawVolumeLightURP.instance.AddSpotLight(this);
+                drawVolumeLightURPInstance = tkVlit_DrawVolumeLightURP.instance;
+            }
 
             m_data.no = id;
             m_data.position = transform.position;
