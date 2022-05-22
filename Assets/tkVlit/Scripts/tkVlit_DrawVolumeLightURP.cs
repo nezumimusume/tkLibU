@@ -32,6 +32,11 @@ namespace VolumeLight {
         }
         public tkVlit_DrawVolumeLightURP()
         {
+            var cameraGo = GameObject.Find("Main Camera");
+            if (cameraGo == null)
+            {
+                return;
+            }
             var camera = GameObject.Find("Main Camera").GetComponent<Camera>();
             // フレームバッファに直接描画すると描画結果が異なることがあるので、
             // 必ず一時テクスチャに描画するようにする。
