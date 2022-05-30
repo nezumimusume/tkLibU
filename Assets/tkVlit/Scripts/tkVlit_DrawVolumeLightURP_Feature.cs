@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace VolumeLight
+namespace tkLibU
 {
     public class tkVlit_DrawVolumeLightURP_Feature : ScriptableRendererFeature
     {

@@ -4,22 +4,22 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace VolumeLight
+namespace tkLibU
 {
     /// <summary>
-    /// ƒ{ƒŠƒ…[ƒ€ƒ‰ƒCƒg•`‰æ‚Ì‹¤’Êˆ—B
+    /// ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒ©ã‚¤ãƒˆæç”»ã®å…±é€šå‡¦ç†ã€‚
     /// </summary>
     public class tkVlit_DrawVolumeLightCommon
     {
-        CommandBuffer m_commandBuffer;                  // ƒRƒ}ƒ“ƒhƒoƒbƒtƒ@B
-        Camera m_camera;                                // ƒJƒƒ‰B
-        tkVlit_RenderTextures m_renderTextures;         // ƒŒƒ“ƒ_ƒŠƒ“ƒOƒeƒNƒXƒ`ƒƒ‚½‚¿B
-        tkLibU_AddCopyFullScreen m_addCopyFullScreen;   // ‘S‰æ–Ê‚Éƒtƒ‹ƒXƒNƒŠ[ƒ“ƒRƒs[B
-        List<tkVlit_SpotLight> m_volumeSpotLightList;   // ƒ{ƒŠƒ…[ƒ€ƒXƒ|ƒbƒgƒ‰ƒCƒg‚ÌƒŠƒXƒgB
-        List<Material> m_drawBackFaceMaterialList;      // ”w–Ê‚Ì[“x’l•`‰æ‚Åg—p‚·‚éƒ}ƒeƒŠƒAƒ‹‚ÌƒŠƒXƒgB
-        List<Material> m_drawFrontFaceMaterialList;     // •\–Ê‚Ì[“x’l•`‰æ‚Åg—p‚·‚éƒ}ƒeƒŠƒAƒ‹‚ÌƒŠƒXƒgB
-        List<MeshFilter> m_drawBackMeshFilterList;      // ”w–Ê‚Ì[“x’l•`‰æ‚Åg—p‚·‚éƒƒbƒVƒ…ƒtƒBƒ‹ƒ^[‚ÌƒŠƒXƒgB
-        List<MeshFilter> m_drawFrontMeshFilterList;     // •\–Ê‚Ì[“x’l•`‰æ‚Åg—p‚·‚éƒƒbƒVƒ…ƒtƒBƒ‹ƒ^[‚ÌƒŠƒXƒgB
+        CommandBuffer m_commandBuffer;                  // ã‚³ãƒãƒ³ãƒ‰ãƒãƒƒãƒ•ã‚¡ã€‚
+        Camera m_camera;                                // ã‚«ãƒ¡ãƒ©ã€‚
+        tkVlit_RenderTextures m_renderTextures;         // ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŸã¡ã€‚
+        tkLibU_AddCopyFullScreen m_addCopyFullScreen;   // å…¨ç”»é¢ã«ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚³ãƒ”ãƒ¼ã€‚
+        List<tkVlit_SpotLight> m_volumeSpotLightList;   // ãƒœãƒªãƒ¥ãƒ¼ãƒ ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã®ãƒªã‚¹ãƒˆã€‚
+        List<Material> m_drawBackFaceMaterialList;      // èƒŒé¢ã®æ·±åº¦å€¤æç”»ã§ä½¿ç”¨ã™ã‚‹ãƒãƒ†ãƒªã‚¢ãƒ«ã®ãƒªã‚¹ãƒˆã€‚
+        List<Material> m_drawFrontFaceMaterialList;     // è¡¨é¢ã®æ·±åº¦å€¤æç”»ã§ä½¿ç”¨ã™ã‚‹ãƒãƒ†ãƒªã‚¢ãƒ«ã®ãƒªã‚¹ãƒˆã€‚
+        List<MeshFilter> m_drawBackMeshFilterList;      // èƒŒé¢ã®æ·±åº¦å€¤æç”»ã§ä½¿ç”¨ã™ã‚‹ãƒ¡ãƒƒã‚·ãƒ¥ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã®ãƒªã‚¹ãƒˆã€‚
+        List<MeshFilter> m_drawFrontMeshFilterList;     // è¡¨é¢ã®æ·±åº¦å€¤æç”»ã§ä½¿ç”¨ã™ã‚‹ãƒ¡ãƒƒã‚·ãƒ¥ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã®ãƒªã‚¹ãƒˆã€‚
         List<tkVlit_DrawFinal> m_drawFinalList;
 
         public tkVlit_DrawVolumeLightCommon(Camera camera)
@@ -44,14 +44,14 @@ namespace VolumeLight
             {
                 return;
             }
-            // ”w–Ê‚Ì[“x’l•`‰æ‚ÉŠÖ‚·‚é‰Šú‰»ˆ—B
+            // èƒŒé¢ã®æ·±åº¦å€¤æç”»ã«é–¢ã™ã‚‹åˆæœŸåŒ–å‡¦ç†ã€‚
             {
                 var trans = spotLight.transform.Find("BackRenderer");
-                // Unity‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒpƒCƒvƒ‰ƒCƒ“‚Å‚Í•`‰æ‚µ‚È‚¢‚Ì‚ÅAMeshRenderer‚ğ–³Œø‚É‚·‚éB
+                // Unityã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã§ã¯æç”»ã—ãªã„ã®ã§ã€MeshRendererã‚’ç„¡åŠ¹ã«ã™ã‚‹ã€‚
                 var meshRenderer = trans.GetComponent<MeshRenderer>();
                 meshRenderer.enabled = false;
-                // Unity‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒpƒCƒvƒ‰ƒCƒ“ŠO‚Å•`‰æ‚·‚é‚½‚ß‚É‚Íƒ}ƒeƒŠƒAƒ‹‚ÆƒƒbƒVƒ…ƒtƒBƒ‹ƒ^[‚ª•K—v‚È‚Ì‚ÅA
-                // ƒŠƒXƒg‚É’Ç‰Á‚·‚éB
+                // Unityã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³å¤–ã§æç”»ã™ã‚‹ãŸã‚ã«ã¯ãƒãƒ†ãƒªã‚¢ãƒ«ã¨ãƒ¡ãƒƒã‚·ãƒ¥ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ãŒå¿…è¦ãªã®ã§ã€
+                // ãƒªã‚¹ãƒˆã«è¿½åŠ ã™ã‚‹ã€‚
                 if (m_camera.actualRenderingPath == RenderingPath.DeferredShading)
                 {
                     //
@@ -64,14 +64,14 @@ namespace VolumeLight
                 m_drawBackFaceMaterialList.Add(meshRenderer.sharedMaterial);
                 m_drawBackMeshFilterList.Add(trans.GetComponent<MeshFilter>());
             }
-            // •\–Ê‚Ì[“x’l•`‰æ‚ÉŠÖ‚·‚é‰Šú‰»ˆ—B
+            // è¡¨é¢ã®æ·±åº¦å€¤æç”»ã«é–¢ã™ã‚‹åˆæœŸåŒ–å‡¦ç†ã€‚
             {
                 var trans = spotLight.transform.Find("FrontRenderer");
-                // Unity‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒpƒCƒvƒ‰ƒCƒ“‚Å‚Í•`‰æ‚µ‚È‚¢‚Ì‚ÅAMeshRenderer‚ğ–³Œø‚É‚·‚éB
+                // Unityã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã§ã¯æç”»ã—ãªã„ã®ã§ã€MeshRendererã‚’ç„¡åŠ¹ã«ã™ã‚‹ã€‚
                 var meshRenderer = trans.GetComponent<MeshRenderer>();
                 meshRenderer.enabled = false;
-                // Unity‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒpƒCƒvƒ‰ƒCƒ“ŠO‚Å•`‰æ‚·‚é‚½‚ß‚É‚Íƒ}ƒeƒŠƒAƒ‹‚ÆƒƒbƒVƒ…ƒtƒBƒ‹ƒ^[‚ª•K—v‚È‚Ì‚ÅA
-                // ƒŠƒXƒg‚É’Ç‰Á‚·‚éB
+                // Unityã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³å¤–ã§æç”»ã™ã‚‹ãŸã‚ã«ã¯ãƒãƒ†ãƒªã‚¢ãƒ«ã¨ãƒ¡ãƒƒã‚·ãƒ¥ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ãŒå¿…è¦ãªã®ã§ã€
+                // ãƒªã‚¹ãƒˆã«è¿½åŠ ã™ã‚‹ã€‚
                 if (m_camera.actualRenderingPath == RenderingPath.DeferredShading)
                 {
                     //
@@ -84,7 +84,7 @@ namespace VolumeLight
                 m_drawFrontFaceMaterialList.Add(meshRenderer.sharedMaterial);
                 m_drawFrontMeshFilterList.Add(trans.GetComponent<MeshFilter>());
             }
-            // ÅI•`‰æ‚ÉŠÖ‚·‚é‰Šú‰»ˆ—B
+            // æœ€çµ‚æç”»ã«é–¢ã™ã‚‹åˆæœŸåŒ–å‡¦ç†ã€‚
             {
                 var trans = spotLight.transform.Find("FinalRenderer");
                 m_drawFinalList.Add(trans.GetComponent<tkVlit_DrawFinal>());
@@ -126,7 +126,7 @@ namespace VolumeLight
             }
 
             m_renderTextures.Update();
-            // •`‰æƒRƒ}ƒ“ƒh‚ğ\’z‚·‚éB
+            // æç”»ã‚³ãƒãƒ³ãƒ‰ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
             tkVlit_BuildDrawVolumeLightCommand.Build(
                 m_commandBuffer,
                 m_renderTextures,

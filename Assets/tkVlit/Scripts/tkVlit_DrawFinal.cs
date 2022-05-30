@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace VolumeLight
+namespace tkLibU
 {
     /// <summary>
     /// ボリュームスポットライトのデータ構造体。

@@ -91,7 +91,6 @@ Shader "tkVlit/DrawFinal"
             }
             half4 frag(v2f i) : SV_Target
             {
-               
                 // 各種UV座標の計算。
                 float2 uv = CalcUVCoordFromClip(i.posInProj);
                 float2 albedoUV = CalcUVCoordFromClip(i.posInProj);

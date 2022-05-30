@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VolumeLight
+namespace tkLibU
 {
         [ExecuteInEditMode]
     public class tkVlit_SpotLight : MonoBehaviour

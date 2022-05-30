@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace VolumeLight
+namespace tkLibU
 {
     /// <summary>
     /// ボリュームライト描画ためのコマンドを構築する処理。
@@ -24,7 +24,7 @@ namespace VolumeLight
             Camera camera,
             RenderTargetIdentifier cameraRenderTargetID
         )
-        {
+        {            
             // ボリュームライトの最終描画でメインシーンの描画結果のテクスチャを利用したいのだが、
             // レンダリングターゲットとして指定されているテクスチャを読み込みで利用することはできないので、
             // 一時的なレンダリングターゲットを取得してそこにコピーする。

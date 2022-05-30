@@ -1,89 +1,101 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-/// <summary>
-/// ƒ{ƒŠƒ…[ƒ€ƒ‰ƒCƒg‚Ì•`‰æ‚Åg‚¤ƒŒƒ“ƒ_ƒŠƒ“ƒOƒeƒNƒXƒ`ƒƒ‚½‚¿B
-/// </summary>
-public class tkVlit_RenderTextures
+
+namespace tkLibU
 {
-    RenderTexture m_backFaceDepthTexture;   // ”w–Ê‚Ì[“x’l‚ª‘‚«‚Ü‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒB
-    RenderTexture m_frontFaceDepthTexture;  // •\–Ê‚Ì[“x’l‚ª‘‚«‚Ü‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒB
-    RenderTexture m_finalTexture;           // ÅI•`‰æŒ‹‰Ê‚Ì‘‚«‚İæB
-    int m_depthMapWidth;                    // [“xƒ}ƒbƒv‚Ì•B
-    int m_depthMapHeight;                   // [“xƒ}ƒbƒv‚Ì‚‚³B
-    bool m_isInitedRenderTexture = false;   // ƒŒƒ“ƒ_ƒŠƒ“ƒOƒeƒNƒXƒ`ƒƒ‚ª‰Šú‰»Ï‚İ‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOB
     /// <summary>
-    /// ”w–Ê‚Ì[“x’l‚ª‘‚«‚Ü‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒ‚ÌƒvƒƒpƒeƒB
+    /// ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒ©ã‚¤ãƒˆã®æç”»ã§ä½¿ã†ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŸã¡ã€‚
     /// </summary>
-    public RenderTexture backFaceDepthTexture
+    public class tkVlit_RenderTextures
     {
-        get => m_backFaceDepthTexture;
-    }
-    /// <summary>
-    /// ‘O–Ê‚Ì[“x’l‚ª‘‚«‚Ü‚ê‚Ä‚¢‚éƒeƒNƒXƒ`ƒƒ‚ÌƒvƒƒpƒeƒBB
-    /// </summary>
-    public RenderTexture frontFaceDepthTexture
-    {
-        get => m_frontFaceDepthTexture;
-    }
-    /// <summary>
-    /// ÅIŒ‹‰Ê‚ğ•`‰æŒ‹‰Ê‚ğ‘‚«‚ŞƒeƒNƒXƒ`ƒƒ‚ÌƒvƒƒpƒeƒBB
-    /// </summary>
-    public RenderTexture finalTexture
-    {
-        get => m_finalTexture;
-    }
-    /// <summary>
-    /// –ˆƒtƒŒ[ƒ€ŒÄ‚Ño‚·XVˆ—
-    /// </summary>
-    public void Update()
-    {
-        if (m_depthMapWidth != Screen.width || m_depthMapHeight != Screen.height)
-        {
-            Init();
-        }
-    }
-    /// <summary>
-    /// ŠeíƒŒƒ“ƒ_ƒŠƒ“ƒOƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
-    /// </summary>
-    public void Init()
-    {
-        if(Screen.width == 0 || Screen.height == 0)
-        {
-            return;
-        }
-        // [“xƒeƒNƒXƒ`ƒƒ‚Ì•‚‚³‚ğ‰Šú‰»B
-        m_depthMapWidth = Screen.width;
-        m_depthMapHeight = Screen.height;
+        RenderTexture m_backFaceDepthTexture; // èƒŒé¢ã®æ·±åº¦å€¤ãŒæ›¸ãè¾¼ã¾ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+        RenderTexture m_frontFaceDepthTexture; // è¡¨é¢ã®æ·±åº¦å€¤ãŒæ›¸ãè¾¼ã¾ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+        RenderTexture m_finalTexture; // æœ€çµ‚æç”»çµæœã®æ›¸ãè¾¼ã¿å…ˆã€‚
+        int m_depthMapWidth; // æ·±åº¦ãƒãƒƒãƒ—ã®å¹…ã€‚
+        int m_depthMapHeight; // æ·±åº¦ãƒãƒƒãƒ—ã®é«˜ã•ã€‚
+        bool m_isInitedRenderTexture = false; // ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒåˆæœŸåŒ–æ¸ˆã¿ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã€‚
 
-        if (m_isInitedRenderTexture)
+        /// <summary>
+        /// èƒŒé¢ã®æ·±åº¦å€¤ãŒæ›¸ãè¾¼ã¾ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+        /// </summary>
+        public RenderTexture backFaceDepthTexture
         {
-            // Ä‰Šú‰»‚É‚È‚é‚Ì‚ÅAŒÃ‚¢ƒŠƒ\[ƒX‚ğ”jŠüB
-            m_backFaceDepthTexture.Release();
-            m_frontFaceDepthTexture.Release();
-            m_finalTexture.Release();
+            get => m_backFaceDepthTexture;
         }
-        // ”w–Ê‚Ì[“x’l‚ğ‘‚«‚ŞƒeƒNƒXƒ`ƒƒ‚ğì¬B
-        m_backFaceDepthTexture = new RenderTexture(
-            m_depthMapWidth,
-            m_depthMapHeight,
-            /*depth=*/0,
-            RenderTextureFormat.RHalf
-        );
-        // ƒAƒ“ƒ`‚Í‚¢‚ç‚È‚¢‚Ì‚ÅAƒTƒ“ƒvƒŠƒ“ƒO”‚ğ1‚É‚·‚éB
-        m_backFaceDepthTexture.antiAliasing = 1;
-        // •\–Ê‚Ì[“x’l‚ğ‘‚«‚±‚ŞƒeƒNƒXƒ`ƒƒ‚ğì¬B
-        // m_backFaceDepthTexture‚Æ“¯‚¶‚Å‚¢‚¢‚Ì‚ÅƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ğŒÄ‚Ño‚·B
-        m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
 
-        // ÅI•`‰æ‚ğs‚¤ƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»B
-        // ƒ‚ƒoƒCƒ‹‚ÌƒsƒNƒZƒ‹ˆ—”\—ÍA“Á‚Éƒƒ‚ƒŠ‘Ñˆæ‚ªŒµ‚µ‚¢‚Ì‚ÅA
-        // ƒŒƒ“ƒ_ƒŠƒ“ƒOƒeƒNƒXƒ`ƒƒ‚Ì‰ğ‘œ“x‚ğ1/4‚É‚µ‚Ä‚¢‚éB
-        m_finalTexture = new RenderTexture(m_depthMapWidth/4, m_depthMapHeight/4, 0, RenderTextureFormat.RGB111110Float);
-        // ‚±‚¢‚Â‚àƒAƒ“ƒ`‚Í‚¢‚ç‚È‚¢B
-        m_finalTexture.antiAliasing = 1;
+        /// <summary>
+        /// å‰é¢ã®æ·±åº¦å€¤ãŒæ›¸ãè¾¼ã¾ã‚Œã¦ã„ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã€‚
+        /// </summary>
+        public RenderTexture frontFaceDepthTexture
+        {
+            get => m_frontFaceDepthTexture;
+        }
 
-        // ‰Šú‰»Ï‚İ‚ÌˆóB
-        m_isInitedRenderTexture = true;
+        /// <summary>
+        /// æœ€çµ‚çµæœã‚’æç”»çµæœã‚’æ›¸ãè¾¼ã‚€ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã€‚
+        /// </summary>
+        public RenderTexture finalTexture
+        {
+            get => m_finalTexture;
+        }
+
+        /// <summary>
+        /// æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã³å‡ºã™æ›´æ–°å‡¦ç†
+        /// </summary>
+        public void Update()
+        {
+            if (m_depthMapWidth != Screen.width || m_depthMapHeight != Screen.height)
+            {
+                Init();
+            }
+        }
+
+        /// <summary>
+        /// å„ç¨®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+        /// </summary>
+        public void Init()
+        {
+            if (Screen.width == 0 || Screen.height == 0)
+            {
+                return;
+            }
+
+            // æ·±åº¦ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…é«˜ã•ã‚’åˆæœŸåŒ–ã€‚
+            m_depthMapWidth = Screen.width;
+            m_depthMapHeight = Screen.height;
+
+            if (m_isInitedRenderTexture)
+            {
+                // å†åˆæœŸåŒ–ã«ãªã‚‹ã®ã§ã€å¤ã„ãƒªã‚½ãƒ¼ã‚¹ã‚’ç ´æ£„ã€‚
+                m_backFaceDepthTexture.Release();
+                m_frontFaceDepthTexture.Release();
+                m_finalTexture.Release();
+            }
+
+            // èƒŒé¢ã®æ·±åº¦å€¤ã‚’æ›¸ãè¾¼ã‚€ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã€‚
+            m_backFaceDepthTexture = new RenderTexture(
+                m_depthMapWidth,
+                m_depthMapHeight,
+                /*depth=*/0,
+                RenderTextureFormat.RHalf
+            );
+            // ã‚¢ãƒ³ãƒã¯ã„ã‚‰ãªã„ã®ã§ã€ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ•°ã‚’1ã«ã™ã‚‹ã€‚
+            m_backFaceDepthTexture.antiAliasing = 1;
+            // è¡¨é¢ã®æ·±åº¦å€¤ã‚’æ›¸ãã“ã‚€ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã€‚
+            // m_backFaceDepthTextureã¨åŒã˜ã§ã„ã„ã®ã§ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’å‘¼ã³å‡ºã™ã€‚
+            m_frontFaceDepthTexture = new RenderTexture(m_backFaceDepthTexture);
+
+            // æœ€çµ‚æç”»ã‚’è¡Œã†ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã€‚
+            // ãƒ¢ãƒã‚¤ãƒ«ã®ãƒ”ã‚¯ã‚»ãƒ«å‡¦ç†èƒ½åŠ›ã€ç‰¹ã«ãƒ¡ãƒ¢ãƒªå¸¯åŸŸãŒå³ã—ã„ã®ã§ã€
+            // ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è§£åƒåº¦ã‚’1/4ã«ã—ã¦ã„ã‚‹ã€‚
+            m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0,
+                RenderTextureFormat.RGB111110Float);
+            // ã“ã„ã¤ã‚‚ã‚¢ãƒ³ãƒã¯ã„ã‚‰ãªã„ã€‚
+            m_finalTexture.antiAliasing = 1;
+
+            // åˆæœŸåŒ–æ¸ˆã¿ã®å°ã€‚
+            m_isInitedRenderTexture = true;
+        }
     }
 }
