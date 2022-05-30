@@ -24,11 +24,10 @@ https://youtu.be/Y8Wgt_oHqcM
 ### 1.3 動作確認環境
 下記の環境で動作確認済み</br>
 **レンダリングパイプライン**</br>
-　ビルトインパイプライン(フォワード、ディファ―ド)</br>
+　ビルトインパイプライン(フォワード、ディファ―ド)、URP</br>
 **プラットフォーム**</br>
 　Windows( GTX1060,RTX3070 )</br>
 　Android( Pixel 6 Pro, Pixel 3, Xperia SO-03J )</br>
 　Mac( M1 macbook pro )</br>
 　iOS( iPad第6世代 )</br>
 
-URPまだ動作未確認。</br>
