@@ -63,7 +63,7 @@ Shader "tkVlit/DrawFinal"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = v.vertex;
+                o.vertex = mul(unity_ObjectToWorld, v.vertex);
                 o.vertex.z = 1.0f;
                 o.vertex.w = 1.0f;
                 o.posInProj = o.vertex;

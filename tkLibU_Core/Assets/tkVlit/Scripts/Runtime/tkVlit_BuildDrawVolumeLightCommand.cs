@@ -24,7 +24,10 @@ namespace tkLibU
             Camera camera,
             RenderTargetIdentifier cameraRenderTargetID
         )
-        {            
+        {
+            if(drawBackMeshFilterList.Count == 0) {
+                return;
+            }
             // ボリュームライトの最終描画でメインシーンの描画結果のテクスチャを利用したいのだが、
             // レンダリングターゲットとして指定されているテクスチャを読み込みで利用することはできないので、
             // 一時的なレンダリングターゲットを取得してそこにコピーする。
@@ -47,11 +50,13 @@ namespace tkLibU
             // 全てにボリュームライトを描画していく。
             for (int litNo = 0; litNo < drawBackFaceMaterialList.Count; litNo++)
             {
+
                 Matrix4x4 mWorld = Matrix4x4.TRS(
                     drawBackMeshFilterList[litNo].transform.position,
                     drawBackMeshFilterList[litNo].transform.rotation,
                     drawBackMeshFilterList[litNo].transform.lossyScale
                 );
+              
                 // 背面の深度値を描画。
                 commandBuffer.SetRenderTarget(renderTextures.backFaceDepthTexture);
                 // todo プラットフォームによってはクリアする値を変更する必要があるかも。
@@ -64,7 +69,6 @@ namespace tkLibU
 
                 // 表面の深度値を描画。
                 commandBuffer.SetRenderTarget(renderTextures.frontFaceDepthTexture);
-                // todo プラットフォームによってはクリアする値を変更する必要があるかも。
                 commandBuffer.ClearRenderTarget(true, true, Color.white);
                 commandBuffer.DrawMesh(
                     drawFrontMeshFilterList[litNo].sharedMesh,
@@ -72,14 +76,56 @@ namespace tkLibU
                     drawFrontFaceMaterialList[litNo]
                 );
                 
+                var bounds = drawBackMeshFilterList[0].sharedMesh.bounds;
+                // バウンディングボックスを構築する8頂点を計算する。
+                Vector3[] boundsVertexPositions = new Vector3[8];
+                // 最小値
+                boundsVertexPositions[0] = bounds.min;
+                boundsVertexPositions[1] = bounds.min;
+                boundsVertexPositions[1].x = bounds.max.x;
+                boundsVertexPositions[2] = bounds.min;
+                boundsVertexPositions[2].y = bounds.max.y;
+                boundsVertexPositions[3] = bounds.min;
+                boundsVertexPositions[3].x = bounds.max.x;
+                boundsVertexPositions[3].y = bounds.max.y;
+                // 最大値
+                boundsVertexPositions[4] = bounds.max;
+                boundsVertexPositions[5] = bounds.max;
+                boundsVertexPositions[5].x = bounds.min.x;
+                boundsVertexPositions[6] = bounds.max;
+                boundsVertexPositions[6].y = bounds.min.y;
+                boundsVertexPositions[7] = bounds.max;
+                boundsVertexPositions[7].x = bounds.min.x;
+                boundsVertexPositions[7].y = bounds.min.y;
+
+                // 8頂点をワールド空間に変換する。
+                var aabbMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                var aabbMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                var projMatrix = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true);
+                for (int i = 0; i < boundsVertexPositions.Length; i++)
+                {
+                    boundsVertexPositions[i] = mWorld.MultiplyPoint(boundsVertexPositions[i]);
+                    boundsVertexPositions[i] = camera.worldToCameraMatrix.MultiplyPoint(boundsVertexPositions[i]);
+                    boundsVertexPositions[i] = projMatrix.MultiplyPoint(boundsVertexPositions[i]);
+                    aabbMin = Vector3.Min(boundsVertexPositions[i], aabbMin);
+                    aabbMax = Vector3.Max(boundsVertexPositions[i], aabbMax) ;
+                }
+                // 拡大率を計算する。
+                var halfSize = ( aabbMax - aabbMin ) * 0.5f;
+                var scale = new Vector3(halfSize.x, halfSize.y, 1.0f);
+                var posFromCenterNormalized = (aabbMin + aabbMax) * 0.5f;
+                posFromCenterNormalized.z = 0.0f;
+                // 最終描画用のワールド行列を計算する。
+                var mWorldFinal = Matrix4x4.TRS(posFromCenterNormalized, Quaternion.identity, scale);
+
                 commandBuffer.SetRenderTarget(renderTextures.finalTexture);
-                
                 drawFinalList[litNo].Draw(
                     camera,
                     renderTextures.frontFaceDepthTexture,
                     renderTextures.backFaceDepthTexture,
                     commandBuffer,
-                    volumeSpotLightList[litNo].volumeSpotLightData
+                    volumeSpotLightList[litNo].volumeSpotLightData,
+                    mWorldFinal
                 );
             }
             

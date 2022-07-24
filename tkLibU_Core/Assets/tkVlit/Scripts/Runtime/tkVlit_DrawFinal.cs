@@ -55,12 +55,8 @@ namespace tkLibU
         {
             DestroyImmediate(m_material);
             m_material = null;
-            if (m_volumeSpotLightDataGraphicsBuffer != null)
-            {
-                m_volumeSpotLightDataGraphicsBuffer.Release();
-
-                m_volumeSpotLightDataGraphicsBuffer = null;
-            }
+            m_volumeSpotLightDataGraphicsBuffer?.Release();
+            m_volumeSpotLightDataGraphicsBuffer = null;
         }
         private void OnDestroy()
         {
@@ -99,11 +95,9 @@ namespace tkLibU
             m_shaderPropToId.viewProjectionMatrixInvID = Shader.PropertyToID("viewProjMatrixInv");
             m_shaderPropToId.randomSeedID = Shader.PropertyToID("ramdomSeed");
             m_shaderPropToId.volumeSpotLightArrayID = Shader.PropertyToID("volumeSpotLightArray");
-
-            
         }
         
-        public void Draw(Camera camera, RenderTexture volumeMapFront, RenderTexture VolumeMapBack, CommandBuffer commandBuffer, VolumeSpotLightData data)
+        public void Draw(Camera camera, RenderTexture volumeMapFront, RenderTexture VolumeMapBack, CommandBuffer commandBuffer, VolumeSpotLightData data, Matrix4x4 mWorld)
         {
             if (m_volumeSpotLightDataGraphicsBuffer == null)
             {
@@ -118,8 +112,7 @@ namespace tkLibU
             // シェーダー側で正規化スクリーン座標系からワールド座標系に復元する処理があるので、ここでビュープロジェクション行列の逆行列を計算する。
             Matrix4x4 mViewProjMatInv = projMatrix * camera.worldToCameraMatrix;
             mViewProjMatInv = Matrix4x4.Inverse(mViewProjMatInv);
-
-            Matrix4x4 m = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, transform.lossyScale);
+          
 
             // テクスチャや行列などのシェーダーリソースをマテリアルに設定する。
             m_material.SetTexture(m_shaderPropToId.volumeFrontTexID, volumeMapFront);
@@ -140,7 +133,7 @@ namespace tkLibU
             // ドロー。
             commandBuffer.DrawMesh(
                  m_meshFilter.sharedMesh,
-                 m,
+                 mWorld,
                  m_material
              );
         }
