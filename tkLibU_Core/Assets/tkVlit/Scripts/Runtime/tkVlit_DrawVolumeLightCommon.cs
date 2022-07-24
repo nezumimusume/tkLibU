@@ -109,11 +109,8 @@ namespace tkLibU
         }
         public void Release()
         {
-            if (m_commandBuffer != null)
-            {
-                m_commandBuffer.Release();
-                m_commandBuffer = null;
-            }
+            m_commandBuffer?.Release();
+            m_commandBuffer = null;
         }
         public CommandBuffer Draw(RenderTargetIdentifier cameraRenderTargetID)
         {

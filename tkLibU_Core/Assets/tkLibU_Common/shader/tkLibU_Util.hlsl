@@ -6,7 +6,6 @@
 inline float2 CalcUVCoordFromClip(float4 coordInClipSpace )
 {
     float2 uv = coordInClipSpace.xy / coordInClipSpace.w;
-    // todo androidのディファードのパスで要動作確認。
     uv *= float2(0.5f, 0.5f * _ProjectionParams.x);
 
     uv += 0.5f;

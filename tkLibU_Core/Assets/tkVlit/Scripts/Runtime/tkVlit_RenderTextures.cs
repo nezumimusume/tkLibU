@@ -90,6 +90,8 @@ namespace tkLibU
             // モバイルのピクセル処理能力、特にメモリ帯域が厳しいので、
             // レンダリングテクスチャの解像度を1/4にしている。
             m_finalTexture = new RenderTexture(m_depthMapWidth / 4, m_depthMapHeight / 4, 0,
+            // todo 最適化のテストのため
+            // m_finalTexture = new RenderTexture(m_depthMapWidth, m_depthMapHeight, 0,
                 RenderTextureFormat.RGB111110Float);
             // こいつもアンチはいらない。
             m_finalTexture.antiAliasing = 1;
