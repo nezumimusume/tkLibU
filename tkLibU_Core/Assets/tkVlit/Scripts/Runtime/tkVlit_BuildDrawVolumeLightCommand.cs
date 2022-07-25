@@ -1,3 +1,4 @@
+#define CALC_BOUND
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -75,7 +76,22 @@ namespace tkLibU
                     mWorld,
                     drawFrontFaceMaterialList[litNo]
                 );
-                
+#if CALC_BOUND
+                var verteces = drawBackMeshFilterList[0].sharedMesh.vertices;
+                // 8頂点をワールド空間に変換する。
+                var aabbMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                var aabbMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                var projMatrix = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true);
+
+                Matrix4x4 mvp = projMatrix * camera.worldToCameraMatrix * mWorld;
+
+                foreach ( var vert in verteces)
+                {
+                    Vector3 v = mvp.MultiplyPoint(vert); 
+                    aabbMin = Vector3.Max(Vector3.one * -1.0f, Vector3.Min(v, aabbMin));
+                    aabbMax = Vector3.Min(Vector3.one, Vector3.Max(v, aabbMax));
+                }
+#else
                 var bounds = drawBackMeshFilterList[0].sharedMesh.bounds;
                 // バウンディングボックスを構築する8頂点を計算する。
                 Vector3[] boundsVertexPositions = new Vector3[8];
@@ -104,12 +120,16 @@ namespace tkLibU
                 var projMatrix = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true);
                 for (int i = 0; i < boundsVertexPositions.Length; i++)
                 {
-                    boundsVertexPositions[i] = mWorld.MultiplyPoint(boundsVertexPositions[i]);
-                    boundsVertexPositions[i] = camera.worldToCameraMatrix.MultiplyPoint(boundsVertexPositions[i]);
-                    boundsVertexPositions[i] = projMatrix.MultiplyPoint(boundsVertexPositions[i]);
-                    aabbMin = Vector3.Min(boundsVertexPositions[i], aabbMin);
-                    aabbMax = Vector3.Max(boundsVertexPositions[i], aabbMax) ;
+                    Matrix4x4 vp = projMatrix * camera.worldToCameraMatrix ;
+                    boundsVertexPositions[i] = mWorld.MultiplyPoint3x4(boundsVertexPositions[i]);
+                    boundsVertexPositions[i] = vp.MultiplyPoint(boundsVertexPositions[i]);
+
+                    // aabbMin = Vector3.Max( Vector3.one * -1.0f, Vector3.Min(boundsVertexPositions[i], aabbMin) );
+                    // aabbMax = Vector3.Min( Vector3.one, Vector3.Max(boundsVertexPositions[i], aabbMax) );
+                    aabbMin =  Vector3.Min(boundsVertexPositions[i], aabbMin);
+                    aabbMax = Vector3.Max(boundsVertexPositions[i], aabbMax);
                 }
+#endif
                 // 拡大率を計算する。
                 var halfSize = ( aabbMax - aabbMin ) * 0.5f;
                 var scale = new Vector3(halfSize.x, halfSize.y, 1.0f);
