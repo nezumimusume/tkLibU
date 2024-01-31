@@ -26,11 +26,8 @@ tkVlit_DrawVolumeLightCommonクラスには、tkVlit_SpotLightオブジェクト
 #### URP
 ユニバーサルレンダリングパイプラインではScriptableRenderingPassを利用してコマンドの生成が実装されている。tkVlit_DrawVolumeLightSPRクラスにそのプログラムが記述されている。
 
-### 1.3 使用方法
-下記動画を参照</br>
-https://youtu.be/Y8Wgt_oHqcM
 
-### 1.4 動作確認環境
+### 1.3 動作確認環境
 下記の環境で動作確認済み</br>
 **レンダリングパイプライン**</br>
 　ビルトインパイプライン(フォワード、ディファ―ド)、URP</br>
